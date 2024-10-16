@@ -1,12 +1,11 @@
 #include "raylib.h"
-#include "raymath.h"
+#include "../include/raymath.h"
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
-#include "Personaje.hpp"
-#include "Tilemap.hpp"
+#include "../include/Personaje.hpp"
+#include "../include/Tilemap.hpp"
 
-using json = nlohmann::json;
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------

@@ -1,30 +1,7 @@
-#include "Tilemap.hpp"
+#include "../include/Tilemap.hpp"
 #include <cstdio>
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
-
-/*
-int Tilemap::mapa[] = {
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1
-};
-
-
-int Tilemap::mapaColisiones[] = { // Solo 0 y 1. 0 es vacio y 1 es con colision
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0,
-    1, 1, 1, 1, 1, 1, 1
-};
-*/
 
 const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles

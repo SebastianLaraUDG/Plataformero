@@ -1,5 +1,5 @@
-#include "Personaje.hpp"
-#include "Tilemap.hpp"
+#include "../include/Personaje.hpp"
+#include "../include/Tilemap.hpp"
 #include <cstdio>
 
 Personaje::Personaje(const Vector2& _posicion){
