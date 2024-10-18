@@ -3,29 +3,40 @@
 #ifndef PERSONAJE_H
 
 #define PERSONAJE_H
-#include "raylib.h"
+#include<raylib.h>
 #include "raymath.h"
-#include "Tilemap.hpp"
+
+class Tilemap;
 
 class Personaje{
 private:
+	enum AnimationState{
+		IDLE,
+		CAMINANDO,
+		SALTANDO,
+		CAYENDO
+	};
 
-const float RADIO = 30.0f;
-Vector2 posicion;
-Vector2 velocidad = Vector2Zero();
-Vector2 aceleracion =  { 0.0f, 1.0f };
-float velocidadTerminal = 25.0f;
-float velocidadMovimiento = 5.0f;
-
-
+	unsigned short ALTO_TILE;
+	unsigned short ANCHO_TILE;
+	Vector2 posicion;
+	Vector2 velocidad = Vector2Zero();
+	Vector2 aceleracion;
+	float velocidadTerminal;
+	float velocidadMovimiento;
+	unsigned short TAMANIO_TILE;
+	AnimationState animacion;
+	Texture2D tile_sheet;
+	Rectangle rectangulo;
+	short flipX;
 
 public:
 
-// Metodos
-Personaje(const float&, const float&);
-Personaje(const Vector2&);
-void Update();
-void Draw(const Tilemap&) const;
+	// Metodos
+	Personaje();
+	void Update();
+	void Draw(const Tilemap&) const;
+	void Animate();
 };
 
 
