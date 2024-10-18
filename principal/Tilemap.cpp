@@ -1,5 +1,5 @@
 #include "../include/Tilemap.hpp"
-#include <cstdio>
+//#include <cstdio>
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
@@ -8,7 +8,6 @@ const Vector2 Tilemap::tiles[] = {
     {7.0f,16.0f}, // 0
     {0.0f,1.0f}, // 1
     {80.0f,15.0f}, // 2
-    
 };
 
 Tilemap::Tilemap() {

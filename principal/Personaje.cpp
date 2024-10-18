@@ -1,28 +1,64 @@
 #include "../include/Personaje.hpp"
 #include "../include/Tilemap.hpp"
-#include <cstdio>
+#include<cstdio> // sprintf
+#include <fstream> // Flujo de archivos
+#include "../include/json.hpp" // JSON
 
-Personaje::Personaje(const Vector2& _posicion){
-    posicion = _posicion;
+Personaje::Personaje(){
+    tile_sheet = LoadTexture("../Assets/spritesheet_players.png");
+
+    // Cargamos la informacion del archivo JSON
+
+    std::ifstream file("../Assets/info_personaje.json");
+    nlohmann::json data = nlohmann::json::parse(file);
+    if (file.is_open())
+    {
+        flipX = data["flipX"].get<short>();
+        posicion.x = data["posicion"][0].get<float>();
+        posicion.y = data["posicion"][1].get<float>();
+
+        velocidad.x = data["velocidad"][0].get<float>();
+        velocidad.y = data["velocidad"][1].get<float>();
+
+        aceleracion.x = data["aceleracion"][0].get<float>();
+        aceleracion.y = data["aceleracion"][1].get<float>();
+
+        velocidadTerminal = data["velocidadTerminal"].get<float>();
+        
+        velocidadMovimiento = data["velocidadMovimiento"].get<float>();
+
+        ANCHO_TILE = data["anchoTile"].get<unsigned short>();
+        ALTO_TILE = data["altoTile"].get<unsigned short>();
+        
+        // Animacion
+        animacion = data["estadoAnimacion"].get<AnimationState>();
+        rectangulo.x = data["rectangulo"][0].get<float>() * ANCHO_TILE;
+        rectangulo.y = data["rectangulo"][1].get<float>() * ALTO_TILE;
+        rectangulo.width = data["rectangulo"][2].get<float>();
+        rectangulo.height = data["rectangulo"][3].get<float>();
+
+        ALTO_TILE = rectangulo.height;
+    }
 }
-
-Personaje::Personaje(const float& x, const float& y){
-    posicion.x = x;
-    posicion.y = y;
-}
-
 
 void Personaje::Update(){
+    static unsigned short framesCounter = 0;
+	framesCounter++;
     // Input
-    if (IsKeyDown(KEY_A))
+    if (IsKeyDown(KEY_A)){
         velocidad.x = -velocidadMovimiento;
-    else if (IsKeyDown(KEY_D))
+        flipX = -1; // Orientacion original
+    }
+    else if (IsKeyDown(KEY_D)){
         velocidad.x = velocidadMovimiento;
+        flipX = 1; // Orientacion invertida
+    }
     else
         velocidad.x = 0.0f;
 
+
     // Estando en el suelo
-    if (posicion.y + RADIO >= GetScreenHeight())
+    if (posicion.y + ALTO_TILE >= GetScreenHeight())
     {
         velocidad.y = 0.0f;
 
@@ -44,16 +80,64 @@ void Personaje::Update(){
         posicion = Vector2Add(posicion, velocidad);
     else
         posicion.y = 0.0f;
+
+    // Ajustamos las animaciones
+    Animate();
 }
 
 
 void Personaje::Draw(const Tilemap& tilemap) const{
-    DrawCircleV(posicion,RADIO, RED);
-    char buffer[20] = {};
-    sprintf(buffer, "%f\n\n%f",posicion.x,posicion.y);
-    DrawText(buffer, 60, 60, 22, BLUE);
-    sprintf(buffer, "%f, %f", tilemap.GetTileVec2(posicion).x, tilemap.GetTileVec2(posicion).y);
-    DrawText(buffer, 60, 160, 22, GREEN);
-    
-    //
+    // DrawCircleV(posicion,RADIO, RED);
+
+    DrawTextureRec(
+    tile_sheet,
+    (Rectangle){rectangulo.x,rectangulo.y,rectangulo.width*flipX,rectangulo.height},
+    posicion,
+    WHITE);
+
+    //TODO: SOLO DEBUG
+    char buff[20]{};
+    sprintf(buff,"X: %.0f \t Y: %.0f",posicion.x,posicion.y); 
+    DrawText(buff,300,300,30,BLUE);
+}
+
+void Personaje::Animate(){
+    // Animaciones segun la velocidad horizontal
+    if(velocidad.x == 0){
+    animacion = IDLE;
+    }
+    else{
+        animacion = CAMINANDO;
+    }
+
+    // Animaciones segun la velocidad vertical
+    if(velocidad.y < 0){
+        animacion = SALTANDO;
+    }
+    else if(velocidad.y > 0){
+        animacion = CAYENDO;
+    }
+
+    switch (animacion)
+    {
+    case IDLE:
+       /* rectangulo = (Rectangle)
+        {
+            // TODO: colocar las coordenadas del tilesheet
+        };
+        */
+        break;
+
+    case CAMINANDO:
+
+        break;
+
+    case SALTANDO:
+
+        break;
+
+    case CAYENDO:
+
+        break;
+    }
 }

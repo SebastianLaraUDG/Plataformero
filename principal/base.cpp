@@ -1,8 +1,5 @@
-#include "raylib.h"
-#include "../include/raymath.h"
-#include <fstream> // Flujo de archivos
-#include "../include/json.hpp" // JSON
-
+//#include<raylib.h>
+//#include "../include/raymath.h"
 #include "../include/Personaje.hpp"
 #include "../include/Tilemap.hpp"
 
@@ -19,7 +16,7 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-    Personaje personaje(screenWidth / 2.0f, 0.0f);
+    Personaje personaje;
     Tilemap tilemap;
     
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
