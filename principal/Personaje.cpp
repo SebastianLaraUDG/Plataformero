@@ -1,4 +1,5 @@
 #include "../include/Personaje.hpp"
+#include "../include/Tilemap.hpp"
 #include<cstdio> // sprintf
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
@@ -40,7 +41,7 @@ Personaje::Personaje(){
     }
 }
 
-void Personaje::Update(){	
+void Personaje::Update(const Tilemap& tilemap){	
     // Input
     if (IsKeyDown(KEY_A)){
         velocidad.x = -velocidadMovimiento;
@@ -78,13 +79,15 @@ void Personaje::Update(){
     else
         posicion.y = 0.0f;
 
+    
+
     // Ajustamos las animaciones
     Animate();
     
 }
 
 
-void Personaje::Draw() const{
+void Personaje::Draw(const Tilemap& tilemap) const{
     DrawTextureRec(
         tile_sheet,
         (Rectangle){rectangulo.x, rectangulo.y, rectangulo.width * static_cast<float>(flipX), rectangulo.height},
@@ -101,6 +104,11 @@ void Personaje::Draw() const{
 
     sprintf(buff,"Estado: %d",animacion);
     DrawText(buff,300,500,30,BLUE);
+
+    float groundY = 0.0f;
+    bool Ground = HasGround(groundY,tilemap);
+    sprintf(buff,"HasGround: %d",Ground);
+    DrawText(buff,300,600,30,RED);
 }
 
 void Personaje::Animate(){
@@ -151,6 +159,30 @@ void Personaje::Animate(){
     rectangulo.y *= ALTO_TILE;
 }
 
+bool Personaje::HasGround(float &OutGroundY,const Tilemap& tilemap) const
+{
+    Vector2 center = posicion;
+    Vector2 bottomLeft = {(center.x - center.x / 2.0f) + 1.0f,
+                          (center.y - center.y / 2.0f) - 1.0f};
+    Vector2 bottomRight = {bottomLeft.x + ANCHO_TILE / 2.0f * 2.0f - 2.0f, bottomLeft.y};
+
+    int tileIndexX, tileIndexY;
+
+    for(Vector2 checkedTile = bottomLeft; ;checkedTile.x+=tilemap.GetTamanioTile()){
+        checkedTile.x = std::min(checkedTile.x, bottomRight.x);
+        tileIndexX = tilemap.GetMapTileXAtPoint(checkedTile.x);
+        tileIndexY = tilemap.GetMapTileYAtPoint(checkedTile.y);
+
+        OutGroundY = (float)tileIndexY * tilemap.GetTamanioTile() + tilemap.GetTamanioTile() / 2.0f + tilemap.GetPosition().y;
+        
+        if (tilemap.IsObstacle(tileIndexX, tileIndexY))
+        return true;
+
+        if (checkedTile.x >= bottomRight.x)
+        break;
+    }
+    return false;
+}
 Personaje::~Personaje(){
     UnloadTexture(tile_sheet);
 }

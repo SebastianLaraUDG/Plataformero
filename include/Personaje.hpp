@@ -34,9 +34,10 @@ public:
 
 	// Metodos
 	Personaje();
-	void Update();
-	void Draw() const;
+	void Update(const Tilemap&);
+	void Draw(const Tilemap&) const;
 	void Animate();
+	bool HasGround(float& OutGroundY,const Tilemap&) const;
 	~Personaje();
 };
 
