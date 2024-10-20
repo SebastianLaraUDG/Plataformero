@@ -11,7 +11,7 @@ class Tilemap;
 class Personaje{
 private:
 	enum AnimationState{
-		IDLE,
+		IDLE = 1,
 		CAMINANDO,
 		SALTANDO,
 		CAYENDO
@@ -35,8 +35,9 @@ public:
 	// Metodos
 	Personaje();
 	void Update();
-	void Draw(const Tilemap&) const;
+	void Draw() const;
 	void Animate();
+	~Personaje();
 };
 
 

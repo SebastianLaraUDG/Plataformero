@@ -1,5 +1,4 @@
 #include "../include/Personaje.hpp"
-#include "../include/Tilemap.hpp"
 #include<cstdio> // sprintf
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
@@ -41,9 +40,7 @@ Personaje::Personaje(){
     }
 }
 
-void Personaje::Update(){
-    static unsigned short framesCounter = 0;
-	framesCounter++;
+void Personaje::Update(){	
     // Input
     if (IsKeyDown(KEY_A)){
         velocidad.x = -velocidadMovimiento;
@@ -83,61 +80,77 @@ void Personaje::Update(){
 
     // Ajustamos las animaciones
     Animate();
+    
 }
 
 
-void Personaje::Draw(const Tilemap& tilemap) const{
-    // DrawCircleV(posicion,RADIO, RED);
-
+void Personaje::Draw() const{
     DrawTextureRec(
-    tile_sheet,
-    (Rectangle){rectangulo.x,rectangulo.y,rectangulo.width*flipX,rectangulo.height},
-    posicion,
-    WHITE);
+        tile_sheet,
+        (Rectangle){rectangulo.x, rectangulo.y, rectangulo.width * static_cast<float>(flipX), rectangulo.height},
+        posicion,
+        WHITE);
 
     //TODO: SOLO DEBUG
     char buff[20]{};
-    sprintf(buff,"X: %.0f \t Y: %.0f",posicion.x,posicion.y); 
+    sprintf(buff,"X: %.0f \t Y: %.0f",posicion.x,posicion.y);
     DrawText(buff,300,300,30,BLUE);
+
+    sprintf(buff,"VX: %.0f \t VY: %.0f",velocidad.x,velocidad.y);
+    DrawText(buff,300,400,30,BLUE);
+
+    sprintf(buff,"Estado: %d",animacion);
+    DrawText(buff,300,500,30,BLUE);
 }
 
 void Personaje::Animate(){
+
+    // Cambiamos el estado de las animaciones
+    
     // Animaciones segun la velocidad horizontal
-    if(velocidad.x == 0){
+    if(velocidad.x == 0 && animacion != IDLE){
     animacion = IDLE;
     }
-    else{
+    else if(velocidad.x != 0 && animacion != CAMINANDO){
         animacion = CAMINANDO;
     }
 
     // Animaciones segun la velocidad vertical
-    if(velocidad.y < 0){
+    if(velocidad.y < 0 && animacion != SALTANDO){
         animacion = SALTANDO;
     }
-    else if(velocidad.y > 0){
+    else if(velocidad.y > 0 && animacion != CAYENDO){
         animacion = CAYENDO;
     }
 
-    switch (animacion)
-    {
+    
+    // Segun el estado actual, tomamos el sprite correspondiente
+    switch (animacion){
     case IDLE:
-       /* rectangulo = (Rectangle)
-        {
-            // TODO: colocar las coordenadas del tilesheet
-        };
-        */
+        rectangulo.x = 6.0f;
+        rectangulo.y = 0.0f;
         break;
 
     case CAMINANDO:
-
+        // TODO: Animacion no funciona
+        rectangulo.x = 5.0f;
+        rectangulo.y = 4.0f;
         break;
 
     case SALTANDO:
-
+        rectangulo.x = 6.0f;
+        rectangulo.y = 1.0f;
         break;
 
     case CAYENDO:
-
+        rectangulo.x = 6.0f;
+        rectangulo.y = 2.0f;
         break;
     }
+    rectangulo.x *= ANCHO_TILE;
+    rectangulo.y *= ALTO_TILE;
+}
+
+Personaje::~Personaje(){
+    UnloadTexture(tile_sheet);
 }

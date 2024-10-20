@@ -13,7 +13,6 @@ int main(void)
     const int screenWidth = 896;//800;
     const int screenHeight = 896;//450;
 
-
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
     Personaje personaje;
@@ -38,7 +37,7 @@ int main(void)
             ClearBackground(RAYWHITE);
             
             tilemap.Draw();
-            personaje.Draw(tilemap);
+            personaje.Draw();
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
