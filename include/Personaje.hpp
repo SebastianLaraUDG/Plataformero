@@ -20,6 +20,7 @@ private:
 	unsigned short ALTO_TILE;
 	unsigned short ANCHO_TILE;
 	Vector2 posicion;
+	Vector2 pivoteColisiones;
 	Vector2 velocidad = Vector2Zero();
 	Vector2 aceleracion;
 	float velocidadTerminal;
@@ -36,8 +37,8 @@ public:
 	Personaje();
 	void Update(const Tilemap&);
 	void Draw(const Tilemap&) const;
-	void Animate();
-	bool HasGround(float& OutGroundY,const Tilemap&) const;
+	void Animate(const int&,const int&);
+	unsigned int ObtenerTileColision(const Tilemap&, const Vector2&) const;
 	~Personaje();
 };
 

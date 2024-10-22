@@ -3,6 +3,7 @@
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
+
 const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles
     {7.0f,16.0f}, // 0
@@ -32,8 +33,19 @@ Tilemap::Tilemap() {
 
 }
 
+int Tilemap::GetAncho() const
+{
+    return (int)ANCHO;
+}
 
-void Tilemap::Draw() const{    
+int Tilemap::GetAlto() const
+{
+    return (int)ALTO;
+}
+
+
+void Tilemap::Draw() const{
+
     for (int i = 0; i < mapa.size(); i++)
     {
         int posX = i % ANCHO;
@@ -45,91 +57,9 @@ void Tilemap::Draw() const{
     }
 }
 
-Vector2 Tilemap::GetMapTileAtPoint(const Vector2& point) const
-{
-    Vector2 tile;
-    tile.x = (point.x - posicion.x + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-    tile.y = (point.y - posicion.y + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-    return tile;
+int Tilemap::GetTamanioTile() const {
+    return (int)TAMANIO_TILE;
 }
-
-Vector2 Tilemap::GetMapTileAtPoint(const float& x, const float& y) const{
-    Vector2 tile;
-    tile.x = (x - posicion.x + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-    tile.y = (y - posicion.y + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-    return tile;
-}
-
-int Tilemap::GetMapTileXAtPoint(const float& x) const
-{
-    return (x - posicion.x + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-}
-
-int Tilemap::GetMapTileYAtPoint(const float& y) const
-{
-    return (y - posicion.y + TAMANIO_TILE / 2.0f) / TAMANIO_TILE;
-}
-
-Vector2 Tilemap::GetMapTilePosition(const Vector2& tileCoords) const
-{
-    return (Vector2){
-        (float)(tileCoords.x * TAMANIO_TILE) + posicion.x,
-        (float)(tileCoords.y * TAMANIO_TILE) + posicion.y};
-}
-
-Vector2 Tilemap::GetMapTilePosition(const float& tileIndexX, const float& tileIndexY) const
-{
-    return Vector2{
-        (float)(tileIndexX * TAMANIO_TILE) + posicion.x,
-        (float)(tileIndexY * TAMANIO_TILE) + posicion.y};
-}
-
-unsigned int Tilemap::GetTile(const int& x, const int& y, const bool& compruebaMapaColisiones = false) const
-{
-    // En caso de que las coordenadas no esten dentro del rango del mapa
-    if (x < 0 || x >= ANCHO
-        || y < 0 || y >= ALTO)
-        return 1; // Tile colisionable
-    if (compruebaMapaColisiones)
-        return mapaColisiones[y * ANCHO + x];
-    else
-        return mapa[y * ANCHO + x];
-}
-
-bool Tilemap::IsObstacle(const int& x, const int& y) const
-{
-    if (x < 0 || x >= ANCHO
-        || y < 0 || y >= ALTO)
-        return true;
-    return  (mapaColisiones[y*ANCHO+x] == 1);//(mapa[y*ANCHO+x] == 1);
-}
-
-bool Tilemap::IsGround(const int& x, const int& y) const
-{
-    if (x < 0 || x >= ANCHO
-       || y < 0 || y >= ALTO)
-        return false;
-    return (mapaColisiones[x * ANCHO + x] == 1);
-}
-
-bool Tilemap::IsEmpty(const int& x, const int& y) const
-{
-    if (x < 0 || x >= ANCHO
-        || y < 0 || y >= ALTO)
-        return false;
-    return (mapaColisiones[y*ANCHO + x] == 0);
-}
-
-int Tilemap::GetTamanioTile() const
-{
-    return (int) TAMANIO_TILE;
-}
-
-Vector2 Tilemap::GetPosition() const
-{
-    return posicion;
-}
-
 
 Tilemap::~Tilemap(){
     UnloadTexture(tile_sheet);
