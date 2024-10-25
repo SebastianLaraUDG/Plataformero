@@ -9,18 +9,28 @@
 class Tilemap{
 private:
     Texture2D tile_sheet;
-    Vector2 posicion;
 
+    // En pixeles
     unsigned short TAMANIO_TILE;
-    unsigned int ANCHO; // En tiles
-    unsigned int ALTO; // En tiles
-    
+    // En cantidad de tiles
+    unsigned int ANCHO;
+    // En cantidad de tiles
+    unsigned int ALTO;
+
+    // Mapa (sin colisiones)
     std::vector<unsigned int> mapa;
     
 
 public:
+
+    // Mapa especificamente de colisiones
     std::vector<unsigned int> mapaColisiones;
+
     // Metodos
+
+
+
+
     Tilemap();
     int GetAncho() const;
     int GetAlto() const;

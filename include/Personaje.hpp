@@ -4,12 +4,15 @@
 
 #define PERSONAJE_H
 #include<raylib.h>
-#include "raymath.h"
+
 
 class Tilemap;
+class Proyectil;
+
 
 class Personaje{
 private:
+	// Estados posibles de la animacion
 	enum AnimationState{
 		IDLE = 1,
 		CAMINANDO,
@@ -20,25 +23,37 @@ private:
 	unsigned short ALTO_TILE;
 	unsigned short ANCHO_TILE;
 	Vector2 posicion;
+
+	// Auxiliar para las colisiones
 	Vector2 pivoteColisiones;
-	Vector2 velocidad = Vector2Zero();
+
+	// Velocidad actual en los dos ejes
+	Vector2 velocidad;
+
 	Vector2 aceleracion;
+	
+	// Velocidad maxima de caida
 	float velocidadTerminal;
-	float velocidadMovimiento;
+	
+	
+	float velocidadMovimiento; // Nota: es el cambio de velocidad
 	unsigned short TAMANIO_TILE;
 	AnimationState animacion;
 	Texture2D tile_sheet;
 	Rectangle rectangulo;
 	short flipX;
 
-public:
+	void ActualizaAnimacion(const int&,const int&);
+	unsigned int ObtenerTileColision(const Tilemap&, const Vector2&) const;
+	void Disparar();
 
+public:
+	Proyectil *proyectiles[10] = {nullptr};
 	// Metodos
 	Personaje();
 	void Update(const Tilemap&);
-	void Draw(const Tilemap&) const;
-	void Animate(const int&,const int&);
-	unsigned int ObtenerTileColision(const Tilemap&, const Vector2&) const;
+	void Draw() const;
+	Vector2 GetPositionV() const;
 	~Personaje();
 };
 

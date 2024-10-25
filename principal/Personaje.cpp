@@ -1,14 +1,17 @@
 #include "../include/Personaje.hpp"
 #include "../include/Tilemap.hpp"
+#include "../include/raymath.h"
+#include "../include/Proyectil.hpp"
 #include<cstdio> // sprintf
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
+
 Personaje::Personaje(){
+    // Carga tilesheet de sprites
     tile_sheet = LoadTexture("../Assets/spritesheet_players.png");
 
     // Cargamos la informacion del archivo JSON
-
     std::ifstream file("../Assets/info_personaje.json");
     nlohmann::json data = nlohmann::json::parse(file);
     if (file.is_open())
@@ -39,17 +42,20 @@ Personaje::Personaje(){
     }
 }
 
-void Personaje::Update(const Tilemap& tilemap){
-    static int framesCounter = 0;
+void Personaje::Update(const Tilemap &tilemap)
+{
+    static int framesCounter = 0; // Frames transcurridos
     const int FRAMES_UPDATE_ANIMACION_CAMINANDO = 5; // Frames para actualizar la animacion de caminata
 
     framesCounter++;
+
     // Creamos un pivote para las colisiones ya que la posicion esta desfado del sprite
     pivoteColisiones = {posicion.x + ANCHO_TILE / 2.0f, posicion.y + (ALTO_TILE / 2.0f) + 50.0f};
+
     // Creamos una variable que comprobara la posible futura posicion dependiendo de la direccion
     Vector2 nuevaPosicion;
     unsigned int tileColision;
-    
+
     // Input
     if (IsKeyDown(KEY_A))
     {
@@ -69,40 +75,45 @@ void Personaje::Update(const Tilemap& tilemap){
         tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
         if (tileColision == 1)
             velocidad.x = 0;
-        else{
-        velocidad.x = velocidadMovimiento;
-        flipX = 1; // Orientacion original
+        else
+        {
+            velocidad.x = velocidadMovimiento;
+            flipX = 1; // Orientacion original
         }
     }
     else
         velocidad.x = 0.0f;
 
+    // Verificar colision con el suelo
+    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y + 80.0f};
+    tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
+    if (tileColision == 1 && velocidad.y >= 0.0f)
+    { // El personaje esta cayendo
+        velocidad.y = 0.0f;
+        if (IsKeyDown(KEY_W))
+        {
+            constexpr float FUERZA_SALTO = -21.0f;
+            velocidad.y = FUERZA_SALTO;
+        }
+    }
+    else if (velocidad.y < velocidadTerminal)
+    {
+        velocidad = Vector2Add(velocidad, aceleracion);
+    }
 
-    // Verificar colisión con el suelo
-nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y + 80.0f}; 
-tileColision = ObtenerTileColision(tilemap, nuevaPosicion); 
-if (tileColision == 1 && velocidad.y >= 0.0f) { // El personaje está cayendo
-    velocidad.y = 0.0f;
-    if (IsKeyDown(KEY_W)) { 
-        constexpr float FUERZA_SALTO = -21.0f; 
-        velocidad.y = FUERZA_SALTO; 
-    } 
-} else if (velocidad.y < velocidadTerminal) {
-    velocidad = Vector2Add(velocidad, aceleracion); 
-} 
+    // Verificar colision con el techo
+    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y - 50.0f};
+    tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
+    if (tileColision == 1 && velocidad.y < 0)
+    { // El personaje esta subiendo
+        velocidad.y = 0;
+    }
 
-// Verificar colisión con el techo
-nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y - 50.0f}; 
-tileColision = ObtenerTileColision(tilemap, nuevaPosicion); 
-if (tileColision == 1 && velocidad.y < 0) { // El personaje está subiendo
-    velocidad.y = 0; 
-}
-
-// Actualizar posicion del personaje si no hay colision
-Vector2 tempPosicion = Vector2Add(posicion, velocidad);
-nuevaPosicion = {tempPosicion.x + ANCHO_TILE / 2.0f, tempPosicion.y + (ALTO_TILE / 2.0f) + 50.0f}; 
-if (ObtenerTileColision(tilemap, nuevaPosicion) != 1)
-    posicion = tempPosicion;
+    // Actualizar posicion del personaje si no hay colision
+    Vector2 tempPosicion = Vector2Add(posicion, velocidad);
+    nuevaPosicion = {tempPosicion.x + ANCHO_TILE / 2.0f, tempPosicion.y + (ALTO_TILE / 2.0f) + 50.0f};
+    if (ObtenerTileColision(tilemap, nuevaPosicion) != 1)
+        posicion = tempPosicion;
 
     /*
     CODIGO ORIGINAL
@@ -131,38 +142,60 @@ if (ObtenerTileColision(tilemap, nuevaPosicion) != 1)
         posicion.y = 0.0f;
 */
 
+    // Mecanica de disparo
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        Disparar();
+
+
     // Ajustamos las animaciones
-    Animate(framesCounter, FRAMES_UPDATE_ANIMACION_CAMINANDO);
+    ActualizaAnimacion(framesCounter, FRAMES_UPDATE_ANIMACION_CAMINANDO);
+
     if (framesCounter > FRAMES_UPDATE_ANIMACION_CAMINANDO)
         framesCounter = 0;
-    }
+}
 
-void Personaje::Draw(const Tilemap& tilemap) const{
-    DrawTextureRec(
-        tile_sheet,
-        (Rectangle){ rectangulo.x * ANCHO_TILE, rectangulo.y * ALTO_TILE,
-         rectangulo.width * static_cast<float>(flipX), rectangulo.height},
-        posicion,
-        WHITE);
+void Personaje::Draw() const{
+/*
+TODO: Escalado pendiente
+    const Vector2 escalado = {0.5f,0.5f};
 
-    /*
-    TODO: SOLO DEBUG
-    DrawCircle(pivoteColisiones.x, pivoteColisiones.y + 50.0f, 5, BLACK);
+    // Definir la fuente de la imagen y la sección a dibujar
+    Rectangle sourceRec = {rectangulo.x * ANCHO_TILE, rectangulo.y * ALTO_TILE,
+             rectangulo.width * static_cast<float>(flipX), rectangulo.height};
+    Rectangle destRec = {posicion.x, posicion.y, (float)ANCHO_TILE * escalado.x, (float)ALTO_TILE * escalado.y};
 
-    char buff[20]{};
-    sprintf(buff,"X: %.0f \t Y: %.0f",posicion.x,posicion.y);
-    DrawText(buff,300,300,30,BLUE);
-
-    sprintf(buff,"VX: %.0f \t VY: %.0f",velocidad.x,velocidad.y);
-    DrawText(buff,300,400,30,BLUE);
-
-    sprintf(buff,"Estado: %d",animacion);
-    DrawText(buff,300,500,30,BLUE);
+    // Dibujar la porción escalada de la textura
+    DrawTexturePro(tile_sheet, sourceRec, destRec, (Vector2){0, 0}, 0.0f, WHITE);
     */
+    
+        DrawTextureRec(
+            tile_sheet,
+            { rectangulo.x * ANCHO_TILE, rectangulo.y * ALTO_TILE,
+             rectangulo.width * static_cast<float>(flipX), rectangulo.height},
+            posicion,
+            WHITE);
+
+        /*
+        TODO: SOLO DEBUG
+        DrawCircle(pivoteColisiones.x, pivoteColisiones.y + 50.0f, 5, BLACK);
+
+        char buff[20]{};
+        sprintf(buff,"X: %.0f \t Y: %.0f",posicion.x,posicion.y);
+        DrawText(buff,300,300,30,BLUE);
+
+        sprintf(buff,"VX: %.0f \t VY: %.0f",velocidad.x,velocidad.y);
+        DrawText(buff,300,400,30,BLUE);
+
+        sprintf(buff,"Estado: %d",animacion);
+        DrawText(buff,300,500,30,BLUE);
+        */
 
 }
 
-void Personaje::Animate(const int& framesCounter,const int& FRAMES_UPDATE_CAMINAR){
+/// @brief Actualiza el estado de las animaciones
+/// @param framesCounter Frames transcurridos
+/// @param FRAMES_UPDATE_CAMINAR Frames para actualizar la animacion especificamente de caminar (no influye las demas animaciones)
+void Personaje::ActualizaAnimacion(const int& framesCounter,const int& FRAMES_UPDATE_CAMINAR){
     static int caminando = 1;
     // Cambiamos el estado de las animaciones
     
@@ -192,7 +225,6 @@ void Personaje::Animate(const int& framesCounter,const int& FRAMES_UPDATE_CAMINA
 
     case CAMINANDO:
     if(framesCounter > FRAMES_UPDATE_CAMINAR){
-        // TODO: Animacion no funciona  
         if(caminando == 1){
         rectangulo.x = 5.0f;
         rectangulo.y = 4.0f;
@@ -218,13 +250,16 @@ void Personaje::Animate(const int& framesCounter,const int& FRAMES_UPDATE_CAMINA
     }
 }
 
-
+/// @brief Obtiene el tile en la posicion dada
+/// @param tilemap 
+/// @param posicionPersonaje 
+/// @return Un valor (0 o 1) indicando si hay colision en este mapa
 unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector2& posicionPersonaje) const{
     // Convertir la posición del personaje a coordenadas de tile
     int tileX = static_cast<int>(posicionPersonaje.x) / tilemap.GetTamanioTile();
     int tileY = static_cast<int>(posicionPersonaje.y) / tilemap.GetTamanioTile();
     
-    // Asegurarse de que las coordenadas estén dentro del rango válido
+    // Asegurarse de que las coordenadas estén dentro del rango valido
     if (tileX >= 0 && tileX < tilemap.GetAncho() && tileY >= 0 && tileY < tilemap.GetAlto()) {
         // Retornar el valor del tile en el mapa de colisiones
         
@@ -237,10 +272,28 @@ unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector
         return tilemap.mapaColisiones[tileY * tilemap.GetAncho() + tileX];
     }
 
-    // Si las coordenadas están fuera de rango, retornar un valor no válido
-    return static_cast<unsigned int>(-1); // Valor no válido indicando que la posición está fuera de los límites
+    // Si las coordenadas estan fuera de rango, retornar un valor no válido
+    return static_cast<unsigned int>(-1); // Valor no valido indicando que la posicion esta fuera de los limites
 }
 
+void Personaje::Disparar()
+{
+        for (int i = 0; i < 10; i++)
+        {
+            if (proyectiles[i] == nullptr)
+            {
+                Vector2 direccionDisparo = GetMousePosition();
+                proyectiles[i] = new Proyectil(posicion, direccionDisparo);
+                break;
+            }
+        }
+}
+
+
+Vector2 Personaje::GetPositionV() const
+{
+    return (Vector2)posicion;
+}
 
 Personaje::~Personaje(){
     UnloadTexture(tile_sheet);

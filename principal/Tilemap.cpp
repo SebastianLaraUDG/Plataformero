@@ -3,7 +3,7 @@
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
-
+/// @brief Todos los posibles tiles
 const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles
     {7.0f,16.0f}, // 0
@@ -13,8 +13,8 @@ const Vector2 Tilemap::tiles[] = {
 };
 
 Tilemap::Tilemap() {
+    // Cargar asset de tilesheet
     tile_sheet = LoadTexture("../Assets/spritesheet_ground.png");
-    posicion = (Vector2) {0.0f,0.0f};
 
     // Cargamos el tilemap desde el file JSON
     std::ifstream file("../Assets/info_tilemap.json");
@@ -57,6 +57,8 @@ void Tilemap::Draw() const{
     }
 }
 
+/// @brief El tamanio de cada tile en pixeles
+/// @return El tamanio de cada tile en pixeles
 int Tilemap::GetTamanioTile() const {
     return (int)TAMANIO_TILE;
 }
