@@ -1,17 +1,13 @@
-//#include<raylib.h>
-//#include "../include/raymath.h"
 #include "../include/Personaje.hpp"
 #include "../include/Tilemap.hpp"
-
 #include "../include/Proyectil.hpp"
 
 /*
 LISTA TODO:
 Hacer mas pequenio al personaje y los tiles
-Proyectiles
+
 Deberia agregar clase Proyectiles tambien a un json?
-void ManejaUpdateBalas() const; //TODO: Tal vez sea mejor solo UpdateBalas?
-void ManejaDrawBalas() const; //TODO: Tal vez sea mejor solo DrawBalas?
+
  */
 
 //------------------------------------------------------------------------------------
@@ -41,6 +37,7 @@ int main(void)
     Personaje personaje;
     Tilemap tilemap;
     
+    // Setup de la camara
     Camera2D camera = { 0 };
     camera.target = personaje.GetPositionV();
     camera.offset = { screenWidth/2.0f, screenHeight/2.0f };
@@ -57,17 +54,10 @@ int main(void)
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
         //----------------------------------------------------------------------------------
-        personaje.Update(tilemap);
+        personaje.Update(tilemap,camera);
         UpdateCameraCenter(&camera,personaje,screenWidth,screenHeight);
 
-/*
-        // Object pool. Los datos (proyectiles estan almacenados )
-        for(auto& proyectil : personaje.proyectiles){
-            if(proyectil->Activo()){
-                proyectil->Update();
-            }
-        }
-*/
+        
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -81,7 +71,8 @@ int main(void)
 
             EndMode2D();
             DrawCircleV(GetMousePosition(), 10.0f, BLUE);// TODO: DEBUG
-        
+
+
         EndDrawing();
             //----------------------------------------------------------------------------------
     }

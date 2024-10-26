@@ -1,67 +1,59 @@
 #include "../include/Proyectil.hpp"
 #include"../include/raymath.h"
 
-
-/*
-MAL:
-La direccion de disparo no es correcta
-
-
- */
-
 //TODO: Deberia agregar esta clase tambien a un json?
 
+
 Proyectil::Proyectil(){
-    posicion = {0.0f,0.0f};
-    velocidad = {0.0f,0.0f};
-    //amplitud = 0.0f;
+    // Inicializacion a ceros e inactivo
+    posicion = Vector2Zero();
+    direccion = Vector2Zero();
     bActivo = false;
+    tiempoTranscurrido = 0;
 }
 
-/// @brief Constructor
-/// @param spawnPos Posicion de spawn, comunmente la posicion del jugador
-/// @param destinoDisparo A donde se debe dirigir el proyectil, comunmente la posicon del mouse
-Proyectil::Proyectil(const Vector2 &spawnPos, const Vector2 &destinoDisparo)
-{
-    // TODO: llevaremos asset?  sprite = LoadTexture(/*Insertar direccion de asset*/);
 
-    posicion = spawnPos;
+/// @brief Activa el proyectil en la posicion y con la direccion especificados
+/// @param pos La ubicacion donde aparecera nuevamente (p. ej la posicion del jugador)
+/// @param nuevoDestino El punto a donde debe dirigirse (p. ej la posicion del mouse)
+void Proyectil::Activar(const Vector2& pos,const Vector2& nuevoDestino){
+    posicion = pos;
 
-    // Guardamos la posicion objetivo basada en posicionMouse - la posicion del jugador
-    direccion = Vector2Subtract(destinoDisparo, spawnPos);
-    // Y la normalizamos ya que no importa la distancia, solo la direccion
+    // Calculamos la direccion
+    direccion = Vector2Subtract(nuevoDestino, pos);
+    // Y la normalizamos ya que no importa su magnitud
     direccion = Vector2Normalize(direccion);
 
-
-    bActivo = false;
-    tiempoVida = 0;
+    // Reiniciamos contador
+    tiempoTranscurrido = 0;
+    // Activamos para que se pueda llamar a su Update y Draw
+    SetEstado(true);
 }
 
-
 void Proyectil::Update(){
-    static unsigned short tiempoTranscurrido = 0;
-    // Dadad la direccion normalizada y los valores de velocidad, calculamos la velocidad total a aplicar
-    //const Vector2 velocidadAplicada = Vector2Scale(direccion,velocidad);
+    if(!bActivo)
+    return;
+    
+    // Actualiza la posicion de acuerdo al producto de su direccion y velocidad
+    posicion = Vector2Add(posicion, Vector2Scale(direccion,VELOCIDAD) );
 
-    // Aplicamos tal velocidad
-    posicion = Vector2Add(posicion, velocidad);
-
-
-
-    /*
-    TODO: No funciona correctamente
-    if(tiempoVida > 100)
-    delete this;
     tiempoTranscurrido++;
-    */
+
+    if(tiempoTranscurrido > TIEMPO_VIDA){
+        bActivo = false;
+        tiempoTranscurrido = 0;
+    }
 }
 
 
 void Proyectil::Draw() const{
+    if(bActivo)
     DrawCircleV(posicion,5.0f,RED);
 }
 
-void Proyectil::CambiaEstado(const bool& nuevoEstado){
+/// @brief Establece segun el valor especificado
+/// @param nuevoEstado
+void Proyectil::SetEstado(const bool& nuevoEstado){
     bActivo = nuevoEstado;
 }
 

@@ -1,13 +1,12 @@
 #include "../include/Personaje.hpp"
 #include "../include/Tilemap.hpp"
 #include "../include/raymath.h"
-#include "../include/Proyectil.hpp"
 #include<cstdio> // sprintf
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
 
-Personaje::Personaje(){
+Personaje::Personaje() : pool(5){ //TODO: Puede cambiarse el 5 por la cantidad de proyectiles
     // Carga tilesheet de sprites
     tile_sheet = LoadTexture("../Assets/spritesheet_players.png");
 
@@ -40,14 +39,17 @@ Personaje::Personaje(){
         rectangulo.width = data["rectangulo"][2].get<float>();
         rectangulo.height = data["rectangulo"][3].get<float>();
     }
+    else{
+        TraceLog(LOG_FATAL,"ERROR: No pudo abrirse el .json del personaje");
+    }
 }
 
-void Personaje::Update(const Tilemap &tilemap)
+void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
 {
     static int framesCounter = 0; // Frames transcurridos
     const int FRAMES_UPDATE_ANIMACION_CAMINANDO = 5; // Frames para actualizar la animacion de caminata
 
-    framesCounter++;
+//    framesCounter++;
 
     // Creamos un pivote para las colisiones ya que la posicion esta desfado del sprite
     pivoteColisiones = {posicion.x + ANCHO_TILE / 2.0f, posicion.y + (ALTO_TILE / 2.0f) + 50.0f};
@@ -144,11 +146,15 @@ void Personaje::Update(const Tilemap &tilemap)
 
     // Mecanica de disparo
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-        Disparar();
-
+        Disparar(camara);
 
     // Ajustamos las animaciones
     ActualizaAnimacion(framesCounter, FRAMES_UPDATE_ANIMACION_CAMINANDO);
+    
+    // Pool object Update
+    pool.Update();
+
+    framesCounter++;
 
     if (framesCounter > FRAMES_UPDATE_ANIMACION_CAMINANDO)
         framesCounter = 0;
@@ -174,7 +180,8 @@ TODO: Escalado pendiente
              rectangulo.width * static_cast<float>(flipX), rectangulo.height},
             posicion,
             WHITE);
-
+        
+        
         /*
         TODO: SOLO DEBUG
         DrawCircle(pivoteColisiones.x, pivoteColisiones.y + 50.0f, 5, BLACK);
@@ -189,7 +196,7 @@ TODO: Escalado pendiente
         sprintf(buff,"Estado: %d",animacion);
         DrawText(buff,300,500,30,BLUE);
         */
-
+       pool.Draw();
 }
 
 /// @brief Actualiza el estado de las animaciones
@@ -224,18 +231,22 @@ void Personaje::ActualizaAnimacion(const int& framesCounter,const int& FRAMES_UP
         break;
 
     case CAMINANDO:
-    if(framesCounter > FRAMES_UPDATE_CAMINAR){
-        if(caminando == 1){
-        rectangulo.x = 5.0f;
-        rectangulo.y = 4.0f;
-        caminando = 2;
+        // Alternamos la animacion de caminata conforme avanza el tiempo
+        if (framesCounter > FRAMES_UPDATE_CAMINAR)
+        {
+            if (caminando == 1)
+            {
+                rectangulo.x = 5.0f;
+                rectangulo.y = 4.0f;
+                caminando = 2;
+            }
+            else
+            {
+                rectangulo.x = 5.0f;
+                rectangulo.y = 5.0f;
+                caminando = 1;
+            }
         }
-        else{
-        rectangulo.x = 5.0f;
-        rectangulo.y = 5.0f;
-        caminando = 1;
-        }
-    }
         break;
 
     case SALTANDO:
@@ -276,19 +287,17 @@ unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector
     return static_cast<unsigned int>(-1); // Valor no valido indicando que la posicion esta fuera de los limites
 }
 
-void Personaje::Disparar()
+void Personaje::Disparar(const Camera2D& camara)
 {
-        for (int i = 0; i < 10; i++)
-        {
-            if (proyectiles[i] == nullptr)
-            {
-                Vector2 direccionDisparo = GetMousePosition();
-                proyectiles[i] = new Proyectil(posicion, direccionDisparo);
-                break;
-            }
-        }
+    Proyectil* proyectil = pool.GetProyectil();
+    if (proyectil)
+    {
+        const Vector2 mousePosition = GetMousePosition();
+        const Vector2 worldMousePosition = GetScreenToWorld2D(mousePosition, camara);
+        proyectil->Activar(pivoteColisiones,worldMousePosition);
+    }
+    TraceLog(LOG_ERROR,"disparando");
 }
-
 
 Vector2 Personaje::GetPositionV() const
 {

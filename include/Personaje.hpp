@@ -4,11 +4,10 @@
 
 #define PERSONAJE_H
 #include<raylib.h>
+#include "../include/ProyectilPool.hpp"
 
 
 class Tilemap;
-class Proyectil;
-
 
 class Personaje{
 private:
@@ -42,16 +41,17 @@ private:
 	Texture2D tile_sheet;
 	Rectangle rectangulo;
 	short flipX;
+	ProyectilPool pool;
 
 	void ActualizaAnimacion(const int&,const int&);
 	unsigned int ObtenerTileColision(const Tilemap&, const Vector2&) const;
-	void Disparar();
+	void Disparar(const Camera2D&);
 
 public:
-	Proyectil *proyectiles[10] = {nullptr};
+	
 	// Metodos
 	Personaje();
-	void Update(const Tilemap&);
+	void Update(const Tilemap&,const Camera2D&);
 	void Draw() const;
 	Vector2 GetPositionV() const;
 	~Personaje();

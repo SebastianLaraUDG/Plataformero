@@ -8,19 +8,20 @@
 
 class Proyectil{
 private:
-Vector2 velocidad = {0.0f,1.0f};
+const float VELOCIDAD = 2;// Modificable, TODO: json?
 Vector2 posicion;
 Vector2 direccion;
 Texture2D sprite;
-unsigned short tiempoVida;
+unsigned short tiempoTranscurrido;
+const unsigned short TIEMPO_VIDA = 60; // Modificable, TODO: json?
 bool bActivo = false;
 
 public:
 Proyectil();
-Proyectil(const Vector2&,const Vector2&);
+void Activar(const Vector2&,const Vector2&);
 void Update();
 void Draw() const;
-void CambiaEstado(const bool&);
+void SetEstado(const bool&);
 bool Activo() const;
 ~Proyectil();
 };
