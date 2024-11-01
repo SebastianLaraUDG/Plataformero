@@ -1,9 +1,8 @@
 #pragma once
 
 #ifndef PERSONAJE_H
-
 #define PERSONAJE_H
-#include<raylib.h>
+//#include<raylib.h>
 #include "../include/ProyectilPool.hpp"
 
 

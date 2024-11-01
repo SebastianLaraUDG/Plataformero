@@ -14,7 +14,7 @@ const Vector2 Tilemap::tiles[] = {
 
 Tilemap::Tilemap() {
     // Cargar asset de tilesheet
-    tile_sheet = LoadTexture("../Assets/spritesheet_ground.png");
+    tile_sheet = LoadTexture("../Assets/spritesheet_ground_scaled.png");
 
     // Cargamos el tilemap desde el file JSON
     std::ifstream file("../Assets/info_tilemap.json");
@@ -29,6 +29,9 @@ Tilemap::Tilemap() {
             mapa.push_back(data["mapa"][i].get<unsigned int>());
             mapaColisiones.push_back(data["mapaColisiones"][i].get<unsigned int>());
         }
+    }
+    else{
+        TraceLog(LOG_ERROR,"ERROR: No se pudo abrir el archivo json del tilemap");
     }
 
 }

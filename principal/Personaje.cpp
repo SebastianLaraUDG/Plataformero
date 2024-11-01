@@ -8,7 +8,7 @@
 
 Personaje::Personaje() : pool(5){ //TODO: Puede cambiarse el 5 por la cantidad de proyectiles
     // Carga tilesheet de sprites
-    tile_sheet = LoadTexture("../Assets/spritesheet_players.png");
+    tile_sheet = LoadTexture("../Assets/spritesheet_players_scaled.png");
 
     // Cargamos la informacion del archivo JSON
     std::ifstream file("../Assets/info_personaje.json");
@@ -49,7 +49,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     static int framesCounter = 0; // Frames transcurridos
     const int FRAMES_UPDATE_ANIMACION_CAMINANDO = 5; // Frames para actualizar la animacion de caminata
 
-//    framesCounter++;
+    framesCounter++;
 
     // Creamos un pivote para las colisiones ya que la posicion esta desfado del sprite
     pivoteColisiones = {posicion.x + ANCHO_TILE / 2.0f, posicion.y + (ALTO_TILE / 2.0f) + 50.0f};
@@ -154,7 +154,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     // Pool object Update
     pool.Update();
 
-    framesCounter++;
+    
 
     if (framesCounter > FRAMES_UPDATE_ANIMACION_CAMINANDO)
         framesCounter = 0;
@@ -296,7 +296,6 @@ void Personaje::Disparar(const Camera2D& camara)
         const Vector2 worldMousePosition = GetScreenToWorld2D(mousePosition, camara);
         proyectil->Activar(pivoteColisiones,worldMousePosition);
     }
-    TraceLog(LOG_ERROR,"disparando");
 }
 
 Vector2 Personaje::GetPositionV() const
