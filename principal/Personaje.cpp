@@ -51,8 +51,8 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
 
     framesCounter++;
 
-    // Creamos un pivote para las colisiones ya que la posicion esta desfado del sprite
-    pivoteColisiones = {posicion.x + ANCHO_TILE / 2.0f, posicion.y + (ALTO_TILE / 2.0f) + 50.0f};
+    // Creamos un pivote para las colisiones ya que la posicion esta desfasado del sprite
+    pivoteColisiones = {posicion.x + ANCHO_TILE / 2.0f, posicion.y + (float)ALTO_TILE * 3.0f / 4.0f};
 
     // Creamos una variable que comprobara la posible futura posicion dependiendo de la direccion
     Vector2 nuevaPosicion;
@@ -61,7 +61,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     // Input
     if (IsKeyDown(KEY_A))
     {
-        nuevaPosicion = {pivoteColisiones.x - 50.0f, pivoteColisiones.y};
+        nuevaPosicion = {pivoteColisiones.x - (float)ANCHO_TILE/4.0f, pivoteColisiones.y};
         tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
         if (tileColision == 1)
             velocidad.x = 0;
@@ -73,7 +73,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     }
     else if (IsKeyDown(KEY_D))
     {
-        nuevaPosicion = {pivoteColisiones.x + 50.0f, pivoteColisiones.y};
+        nuevaPosicion = {pivoteColisiones.x + (float)ANCHO_TILE/4.0f, pivoteColisiones.y};
         tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
         if (tileColision == 1)
             velocidad.x = 0;
@@ -85,13 +85,16 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     }
     else
         velocidad.x = 0.0f;
+        
 
     // Verificar colision con el suelo
-    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y + 80.0f};
+    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y + 35.0f};
     tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
+    
     if (tileColision == 1 && velocidad.y >= 0.0f)
     { // El personaje esta cayendo
         velocidad.y = 0.0f;
+         
         if (IsKeyDown(KEY_W))
         {
             constexpr float FUERZA_SALTO = -21.0f;
@@ -104,7 +107,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     }
 
     // Verificar colision con el techo
-    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y - 50.0f};
+    nuevaPosicion = {pivoteColisiones.x, pivoteColisiones.y - 35.0f};
     tileColision = ObtenerTileColision(tilemap, nuevaPosicion);
     if (tileColision == 1 && velocidad.y < 0)
     { // El personaje esta subiendo
@@ -113,7 +116,7 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
 
     // Actualizar posicion del personaje si no hay colision
     Vector2 tempPosicion = Vector2Add(posicion, velocidad);
-    nuevaPosicion = {tempPosicion.x + ANCHO_TILE / 2.0f, tempPosicion.y + (ALTO_TILE / 2.0f) + 50.0f};
+    nuevaPosicion = {tempPosicion.x + ANCHO_TILE / 2.0f, tempPosicion.y + ALTO_TILE * 3.0f / 4.0f};
     if (ObtenerTileColision(tilemap, nuevaPosicion) != 1)
         posicion = tempPosicion;
 
@@ -154,8 +157,6 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     // Pool object Update
     pool.Update();
 
-    
-
     if (framesCounter > FRAMES_UPDATE_ANIMACION_CAMINANDO)
         framesCounter = 0;
 }
@@ -180,8 +181,13 @@ TODO: Escalado pendiente
              rectangulo.width * static_cast<float>(flipX), rectangulo.height},
             posicion,
             WHITE);
-        
-        
+
+        DrawCircleV(posicion, 5.0f, BLACK);
+        DrawCircleV(pivoteColisiones, 5.0f, BLUE);
+        char buff[20] = {};
+        sprintf(buff, "PivX:%.0f,pivY:%.0f", pivoteColisiones.x, pivoteColisiones.y);
+        DrawText(buff, posicion.x, posicion.y - 200, 20, GRAY);
+
         /*
         TODO: SOLO DEBUG
         DrawCircle(pivoteColisiones.x, pivoteColisiones.y + 50.0f, 5, BLACK);

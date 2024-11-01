@@ -46,6 +46,11 @@ int Tilemap::GetAlto() const
     return (int)ALTO;
 }
 
+/// @brief El tamanio de cada tile en pixeles
+/// @return El tamanio de cada tile en pixeles
+int Tilemap::GetTamanioTile() const {
+    return (int)TAMANIO_TILE;
+}
 
 void Tilemap::Draw() const{
 
@@ -60,11 +65,6 @@ void Tilemap::Draw() const{
     }
 }
 
-/// @brief El tamanio de cada tile en pixeles
-/// @return El tamanio de cada tile en pixeles
-int Tilemap::GetTamanioTile() const {
-    return (int)TAMANIO_TILE;
-}
 
 Tilemap::~Tilemap(){
     UnloadTexture(tile_sheet);

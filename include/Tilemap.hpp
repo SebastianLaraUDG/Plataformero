@@ -34,8 +34,8 @@ public:
     Tilemap();
     int GetAncho() const;
     int GetAlto() const;
-    void Draw() const;
     int GetTamanioTile() const;
+    void Draw() const;
     ~Tilemap();
 
     const static Vector2 tiles[];
