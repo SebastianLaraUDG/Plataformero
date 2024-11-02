@@ -28,9 +28,6 @@ public:
 
     // Metodos
 
-
-
-
     Tilemap();
     int GetAncho() const;
     int GetAlto() const;

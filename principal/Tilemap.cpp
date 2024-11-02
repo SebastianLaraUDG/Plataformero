@@ -8,8 +8,6 @@ const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles
     {7.0f,16.0f}, // 0
     {0.0f,1.0f}, // 1
-    {80.0f,15.0f}, // 2
-    
 };
 
 Tilemap::Tilemap() {
@@ -57,8 +55,14 @@ void Tilemap::Draw() const{
     for (int i = 0; i < mapa.size(); i++)
     {
         int posX = i % ANCHO;
-        int posY = i / ALTO;
-		const Rectangle rectangle = { tiles[mapa[i]].x * (float)TAMANIO_TILE, tiles[mapa[i]].y * (float)TAMANIO_TILE, (float)TAMANIO_TILE, (float)TAMANIO_TILE };
+        int posY = i / ANCHO;
+		const Rectangle rectangle = {
+            tiles[mapa[i]].x * (float)TAMANIO_TILE,
+            tiles[mapa[i]].y * (float)TAMANIO_TILE,
+            (float)TAMANIO_TILE,
+            (float)TAMANIO_TILE
+        };
+
 		DrawTextureRec(tile_sheet, rectangle,
         { static_cast<float>(posX) * TAMANIO_TILE , static_cast<float>(posY) * TAMANIO_TILE },
         WHITE);
