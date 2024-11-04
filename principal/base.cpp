@@ -7,7 +7,6 @@
 LISTA TODO:
 Hacer mas pequenio al personaje y los tiles
 
-Deberia agregar clase Proyectiles tambien a un json?
 TODO: quitar todos los delete de cada clase de escena y crear un metodo en la clase Escena para el delete? --Archivo Escena.hpp/Escena.cpp
 TODO: Necesario? escenaActual = new EscenaJuego(); --Este archivo
  */
@@ -22,7 +21,7 @@ TODO: Necesario? escenaActual = new EscenaJuego(); --Este archivo
 /// @param width Ancho de la pantalla
 /// @param height Alto de la pantalla
 void UpdateCameraCenter(Camera2D* camera,const Personaje& personaje,const int& width,const int& height){
-    camera->offset = (Vector2){ width/2.0f, height/2.0f };
+    camera->offset = { width/2.0f, height/2.0f };
     camera->target = personaje.GetPositionV();
 }
 
@@ -57,7 +56,7 @@ int main(void)
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-    Personaje personaje;
+    Personaje personaje(15);
     Tilemap tilemap;
     
     // Setup de la camara

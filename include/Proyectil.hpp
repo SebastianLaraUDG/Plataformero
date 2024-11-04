@@ -7,12 +7,15 @@
 
 class Proyectil{
 private:
-const float VELOCIDAD = 2;// Modificable, TODO: json?
+const float VELOCIDAD = 8.0f;
 Vector2 posicion;
 Vector2 direccion;
 Texture2D sprite;
 unsigned short tiempoTranscurrido;
-const unsigned short TIEMPO_VIDA = 60; // Modificable, TODO: json?
+
+// En frames
+const unsigned short TIEMPO_VIDA = 120;
+
 bool bActivo = false;
 
 public:
