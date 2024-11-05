@@ -5,6 +5,7 @@
 
 #include<raylib.h>
 
+
 class Proyectil{
 private:
 const float VELOCIDAD = 8.0f;

@@ -244,7 +244,7 @@ void Personaje::ActualizarAnimacion(const int& framesCounter,const int& FRAMES_U
 /// @param posicionPersonaje 
 /// @return Un valor (0 o 1) indicando si hay colision en este mapa
 unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector2& posicionPersonaje) const{
-    // Convertir la posición del personaje a coordenadas de tile
+    // Convertir la posicion del personaje a coordenadas de tile
     int tileX = static_cast<int>(posicionPersonaje.x) / tilemap.GetTamanioTile();
     int tileY = static_cast<int>(posicionPersonaje.y) / tilemap.GetTamanioTile();
     
@@ -253,7 +253,7 @@ unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector
     // Asegurarse de que las coordenadas estén dentro del rango valido
     if (tileX >= 0 && tileX < anchoMapa && tileY >= 0 && tileY < tilemap.GetAlto()) {
         // Retorna el valor del tile en el mapa de colisiones
-        return tilemap.mapaColisiones[tileY * anchoMapa + tileX];
+        return tilemap.getMapaColisiones()[tileY * anchoMapa + tileX];
     }
 
     // Si las coordenadas estan fuera de rango, retornar un valor no valido

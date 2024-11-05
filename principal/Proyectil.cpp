@@ -1,6 +1,7 @@
 #include "../include/Proyectil.hpp"
 #include"../include/raymath.h"
 
+
 //TODO: Deberia agregar esta clase tambien a un json?
 
 
@@ -37,8 +38,13 @@ void Proyectil::Update(){
     // Actualiza la posicion de acuerdo al producto de su direccion y velocidad
     posicion = Vector2Add(posicion, Vector2Scale(direccion,VELOCIDAD) );
 
-    tiempoTranscurrido++;
+    //TODO: Si esta colisionando con un tile, desactivar
 
+
+
+
+    tiempoTranscurrido++;
+    // Desactiva en caso de que se ya superado su tiempo de vida
     if(tiempoTranscurrido > TIEMPO_VIDA){
         bActivo = false;
         tiempoTranscurrido = 0;
@@ -60,6 +66,7 @@ void Proyectil::SetEstado(const bool& nuevoEstado){
 bool Proyectil::Activo() const{
     return bActivo;
 }
+
 
 Proyectil::~Proyectil(){
     //UnloadTexture(sprite);

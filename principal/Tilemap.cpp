@@ -3,6 +3,7 @@
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 
+
 /// @brief Todos los posibles tiles
 const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles
@@ -43,6 +44,12 @@ int Tilemap::GetAlto() const
 {
     return (int)ALTO;
 }
+
+const std::vector<unsigned int>& Tilemap::getMapaColisiones() const
+{
+    return mapaColisiones;
+}
+
 
 /// @brief El tamanio de cada tile en pixeles
 /// @return El tamanio de cada tile en pixeles

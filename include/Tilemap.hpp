@@ -19,18 +19,18 @@ private:
 
     // Mapa (sin colisiones)
     std::vector<unsigned int> mapa;
-    
-
-public:
 
     // Mapa especificamente de colisiones
     std::vector<unsigned int> mapaColisiones;
+
+public:
 
     // Metodos
 
     Tilemap();
     int GetAncho() const;
     int GetAlto() const;
+    const std::vector<unsigned int>& getMapaColisiones() const;
     int GetTamanioTile() const;
     void Draw() const;
     ~Tilemap();
