@@ -7,11 +7,14 @@
 /// @brief Todos los posibles tiles
 const Vector2 Tilemap::tiles[] = {
     // Guarda aqui los tiles
-    {7.0f,16.0f}, // 0
-    {0.0f,1.0f}, // 1
+    {7.0f,16.0f}, // 0 VACIO
+    {0.0f,1.0f}, // 1  Piso central
+    {1.0f,0.0f} // 2 TIERRA RELLENA
 };
 
-Tilemap::Tilemap() {
+/// @brief 
+/// @param indiceNivel Indice 1 y 2 solamente
+Tilemap::Tilemap(int indiceNivel) {
     // Cargar asset de tilesheet
     tile_sheet = LoadTexture("../Assets/spritesheet_ground_scaled.png");
 
@@ -24,9 +27,23 @@ Tilemap::Tilemap() {
         TAMANIO_TILE = data["tamanioTile"].get<unsigned short>();
         
         // Inicializacion del mapa
-        for(unsigned int i = 0; i < ANCHO * ALTO; i++){
-            mapa.push_back(data["mapa"][i].get<unsigned int>());
-            mapaColisiones.push_back(data["mapaColisiones"][i].get<unsigned int>());
+        switch (indiceNivel)
+        {
+        case 1:
+            for (unsigned int i = 0; i < ANCHO * ALTO; i++)
+            {
+                mapa.push_back(data["mapa_nivel_1"][i].get<unsigned int>());
+                mapaColisiones.push_back(data["mapaColisiones_nivel_1"][i].get<unsigned int>());
+            }
+            break;
+
+        case 2:
+            for (unsigned int i = 0; i < ANCHO * ALTO; i++)
+            {
+                mapa.push_back(data["mapa_nivel_2"][i].get<unsigned int>());
+                mapaColisiones.push_back(data["mapaColisiones_nivel_2"][i].get<unsigned int>());
+            }
+            break;
         }
     }
     else{

@@ -6,9 +6,11 @@
 #include "../include/json.hpp" // JSON
 
 
-Personaje::Personaje(int cantidadBalas) : pool(cantidadBalas){
+Personaje::Personaje(const float& xInicial, const float& yInicial,int cantidadBalas) : pool(cantidadBalas){
     // Carga tilesheet de sprites
     tile_sheet = LoadTexture("../Assets/spritesheet_players_scaled.png");
+    // Carga imagen de corazon
+    corazonHud = LoadTexture("../Assets/hudHeart_full.png");
 
     // Cargamos la informacion del archivo JSON
     std::ifstream file("../Assets/info_personaje.json");
@@ -16,8 +18,11 @@ Personaje::Personaje(int cantidadBalas) : pool(cantidadBalas){
     if (file.is_open())
     {
         flipX = data["flipX"].get<short>();
-        posicion.x = data["posicion"][0].get<float>();
-        posicion.y = data["posicion"][1].get<float>();
+
+        posicion.x = xInicial;
+        posicion.y = yInicial;
+        //posicion.x = data["posicion"][0].get<float>();
+        //posicion.y = data["posicion"][1].get<float>();
 
         velocidad.x = data["velocidad"][0].get<float>();
         velocidad.y = data["velocidad"][1].get<float>();
@@ -42,9 +47,12 @@ Personaje::Personaje(int cantidadBalas) : pool(cantidadBalas){
     else{
         TraceLog(LOG_FATAL,"ERROR: No pudo abrirse el .json del personaje");
     }
+    vidas = 3;
+    puedeRecibirDanio = true;
+    color = WHITE;
 }
 
-void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
+void Personaje::Update(const Tilemap &tilemap, Camera2D& camara)
 {
     static int framesCounter = 0; // Frames transcurridos
     const int FRAMES_UPDATE_ANIMACION_CAMINANDO = 5; // Frames para actualizar la animacion de caminata
@@ -61,7 +69,9 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     // Input
     MovimientoHorizontal(tilemap);
     MovimientoVertical(tilemap);
-        
+    
+    // Actualiza camara
+    UpdateCameraCenter(&camara);
 
     // Actualizar posicion del personaje si no hay colision
     Vector2 tempPosicion = Vector2Add(posicion, velocidad);
@@ -81,6 +91,17 @@ void Personaje::Update(const Tilemap &tilemap,const Camera2D& camara)
     // Ajustamos las animaciones
     ActualizarAnimacion(framesCounter, FRAMES_UPDATE_ANIMACION_CAMINANDO);
 
+    // Reseteamos que pueda recibir danio
+    if (puedeRecibirDanio == false)
+    {
+        inmunidadDanioFrames--;
+        if (inmunidadDanioFrames <= 0)
+        {
+            puedeRecibirDanio = true;
+            color = WHITE;
+        }
+    }
+
     // Reiniciamos el tiempo transcurrido entre animaciones de caminata
     if (framesCounter > FRAMES_UPDATE_ANIMACION_CAMINANDO)
         framesCounter = 0;
@@ -95,12 +116,14 @@ void Personaje::Draw() const
          rectangulo.width * static_cast<float>(flipX), rectangulo.height
         },
         posicion,
-        WHITE);
+        color);
 
     // TODO: DEBUG
     DrawCircleV(posicion, 5.0f, BLACK);
     DrawCircleV(pivoteColisiones, 5.0f, BLUE);
+    
     char buff[20] = {};
+
     sprintf(buff, "PivX:%.0f,pivY:%.0f", pivoteColisiones.x, pivoteColisiones.y);
     DrawText(buff, posicion.x, posicion.y - 200, 20, GRAY);
 
@@ -159,7 +182,7 @@ void Personaje::MovimientoVertical(const Tilemap &tilemap)
 
         if (IsKeyDown(KEY_W))
         {
-            constexpr float FUERZA_SALTO = -21.0f;
+            constexpr float FUERZA_SALTO = -18.0f;
             velocidad.y = FUERZA_SALTO;
         }
     }
@@ -175,6 +198,11 @@ void Personaje::MovimientoVertical(const Tilemap &tilemap)
     {
         velocidad.y = 0;
     }
+}
+
+void Personaje::UpdateCameraCenter(Camera2D* camera){
+    camera->offset = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
+    camera->target = this->posicion;
 }
 
 /// @brief Actualiza el estado de las animaciones
@@ -249,12 +277,17 @@ unsigned int Personaje::ObtenerTileColision(const Tilemap& tilemap, const Vector
     int tileY = static_cast<int>(posicionPersonaje.y) / tilemap.GetTamanioTile();
     
     int anchoMapa = tilemap.GetAncho();
+    unsigned int colision;
+
 
     // Asegurarse de que las coordenadas estén dentro del rango valido
     if (tileX >= 0 && tileX < anchoMapa && tileY >= 0 && tileY < tilemap.GetAlto()) {
         // Retorna el valor del tile en el mapa de colisiones
-        return tilemap.getMapaColisiones()[tileY * anchoMapa + tileX];
+        colision = tilemap.getMapaColisiones()[tileY * anchoMapa + tileX];
     }
+    
+
+    return colision;
 
     // Si las coordenadas estan fuera de rango, retornar un valor no valido
     return static_cast<unsigned int>(-1); // Valor no valido indicando que la posicion esta fuera de los limites
@@ -276,6 +309,18 @@ Vector2 Personaje::GetPositionV() const
     return (Vector2)posicion;
 }
 
+void Personaje::RecibeDanio()
+{
+    if (puedeRecibirDanio)
+    {
+        vidas--;
+        puedeRecibirDanio = false;
+        inmunidadDanioFrames = 240; // 4 segundos
+        color = RED;
+    }
+}
+
 Personaje::~Personaje(){
     UnloadTexture(tile_sheet);
+    UnloadTexture(corazonHud);
 }

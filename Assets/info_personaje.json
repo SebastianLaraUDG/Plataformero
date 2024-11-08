@@ -1,6 +1,6 @@
 {
 	"flipX" : 1,
-	"posicion" : [ 1200.0, 750.0],
+
 	"velocidad" : [ 0.0, 0.0],
 	"aceleracion" : [ 0.0, 1.0],
 	"velocidadTerminal" : 25.0,
@@ -15,5 +15,7 @@
         0.0,
         64.0,
         128.0
-	]
+	],
+
+	"posicion" : [ 1200.0, 750.0]
 }

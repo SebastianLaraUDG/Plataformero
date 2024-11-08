@@ -39,9 +39,18 @@ void GestionaEscena(Escena *&escenaActual, int &indiceEscenaActual, int &indiceE
         // Escena correspondiente
         switch (indiceEscenaActual)
         {
+        case 0: // Escena de inicio
+            escenaActual = new EscenaInicio();
+            break;
         case 1: // Cambiamos a escena de Mostrar Controles
             escenaActual = new EscenaControles();
             break;
+        case 2:
+            escenaActual = new EscenaNivel1();
+            break;
+
+        case 50: // Escena de derrota
+            escenaActual = new EscenaDerrota();
         }
 
         // Inicializacion
@@ -115,8 +124,8 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-//            ClearBackground(RAYWHITE);
-            escenaActual->Draw();
+        // ClearBackground(RAYWHITE);
+        escenaActual->Draw();
 
         EndDrawing();
             //----------------------------------------------------------------------------------

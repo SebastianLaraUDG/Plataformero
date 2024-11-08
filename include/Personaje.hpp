@@ -21,17 +21,17 @@ private:
 	// Velocidad maxima de caida
 	float velocidadTerminal;
 	AnimationState animacion;
+	int inmunidadDanioFrames;
+	Color color;
 
 	void MovimientoHorizontal(const Tilemap &);
 	void MovimientoVertical(const Tilemap &);
+	void UpdateCameraCenter(Camera2D*);
 
 protected:
 	unsigned short ALTO_TILE;
 	unsigned short ANCHO_TILE;
 	Vector2 posicion;
-
-	// Auxiliar para las colisiones
-	Vector2 pivoteColisiones;
 
 	// Velocidad actual en los dos ejes
 	Vector2 velocidad;
@@ -50,10 +50,16 @@ protected:
 
 public:
 	// Metodos
-	Personaje(int cantidadBalas = 5);
-	virtual void Update(const Tilemap &, const Camera2D &);
+	Personaje(const float&, const float&, int cantidadBalas = 5);
+	Texture2D corazonHud;
+	int vidas;
+	bool puedeRecibirDanio;
+	// Auxiliar para las colisiones
+	Vector2 pivoteColisiones;
+	void Update(const Tilemap &, Camera2D &);
 	void Draw() const;
 	Vector2 GetPositionV() const;
+	void RecibeDanio();
 	~Personaje();
 };
 

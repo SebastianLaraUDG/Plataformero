@@ -8,14 +8,14 @@
 
 class Proyectil{
 private:
-const float VELOCIDAD = 8.0f;
+const float VELOCIDAD = 2.7f;
 Vector2 posicion;
 Vector2 direccion;
 Texture2D sprite;
 unsigned short tiempoTranscurrido;
 
 // En frames
-const unsigned short TIEMPO_VIDA = 120;
+const unsigned short TIEMPO_VIDA = 60;
 
 bool bActivo = false;
 

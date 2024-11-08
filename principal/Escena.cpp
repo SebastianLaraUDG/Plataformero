@@ -1,8 +1,8 @@
 #include "../include/Escena.hpp"
+#include <cstdio>
 
-// TODO: quitar todos los delete de cada clase de escena y crear un metodo en la clase Escena para el delete?
-
-void Escena::DeInit(){
+void Escena::DeInit()
+{
     delete this;
 }
 
@@ -11,16 +11,16 @@ void Escena::DeInit(){
 /// @brief Si se dio clic en algun menu/boton (inicio,salir, etc)
 /// @param boton Las dimensiones y posicion del posible boton
 /// @return Si el boton fue presionado, de otra forma false
-bool EscenaInteractuable::ClicEnBoton(const Rectangle& boton) const
-{   
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+bool EscenaInteractuable::ClicEnBoton(const Rectangle &boton) const
+{
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+    {
         const Vector2 mousePos = GetMousePosition();
-        if(CheckCollisionPointRec(mousePos,boton))
-        return true;
+        if (CheckCollisionPointRec(mousePos, boton))
+            return true;
     }
     return false;
 }
-
 
 //--------------------------------------------------------------
 
@@ -41,7 +41,7 @@ void EscenaInicio::Init()
         static_cast<float>(ANCHO_BOTON),
         static_cast<float>(ALTO_BOTON)};
 
-        TraceLog(LOG_INFO,"Cargada escena INICIO");
+    TraceLog(LOG_INFO, "Cargada escena INICIO");
 }
 void EscenaInicio::Update(int &indiceEscenaActual)
 {
@@ -55,7 +55,6 @@ void EscenaInicio::Update(int &indiceEscenaActual)
     // Clic en boton de salir
     if (ClicEnBoton(botones[1]))
     {
-        const int INDICE_SALIDA = -1;
         indiceEscenaActual = INDICE_SALIDA;
     }
 }
@@ -75,14 +74,14 @@ void EscenaInicio::Draw() const
     DrawText("SALIR", botones[1].x + ANCHO_BOTON * 6 / 15, botones[1].y + ALTO_BOTON / 3, 20, WHITE);
 }
 
-void EscenaInicio::DeInit(){
-    TraceLog(LOG_INFO, "Se presiono el boton de salida");
+void EscenaInicio::DeInit()
+{
+    TraceLog(LOG_INFO, "Saliendo de la escena de INICIO...");
 
     UnloadTexture(imagen);
     // Liberacion de memoria
     Escena::DeInit();
 }
-
 
 //--------------------------------------------------------------
 
@@ -92,14 +91,14 @@ void EscenaControles::Init()
     spriteCaminando = LoadTexture("../Assets/alienBlue_walk1.png");
     spriteSaltando = LoadTexture("../Assets/alienBlue_jump.png");
     spriteClicIzquierdo = LoadTexture("../Assets/clic izquierdo.png");
-    
+
     botonSiguiente = {
         static_cast<float>(GetScreenWidth() - 200),
         static_cast<float>(GetScreenHeight() - 50),
         200,
         50};
 
-    TraceLog(LOG_INFO,"Cargada escena CONTROLES");
+    TraceLog(LOG_INFO, "Cargada escena CONTROLES");
 }
 
 void EscenaControles::Update(int &indiceEscenaActual)
@@ -113,18 +112,21 @@ void EscenaControles::Update(int &indiceEscenaActual)
 
 void EscenaControles::Draw() const
 {
-    const int ESPACIADO = GetScreenWidth()/8;
+    const int ESPACIADO = GetScreenWidth() / 8;
     const int ANCHO_SPRITE = 128;
 
     ClearBackground(BLACK);
-    
+
+    // Dibuja CONTROLES
+    DrawText("CONTROLES", GetScreenWidth() / 2 - 100, 0, 33, GOLD);
+
     // Dibuja Mover
-    DrawTexture(spriteCaminando, ESPACIADO - ANCHO_SPRITE, 0, WHITE);
-    DrawText("  A - D\n\n Mover", ESPACIADO - ANCHO_SPRITE, GetScreenHeight() / 2, 32, WHITE);
+    DrawTexture(spriteCaminando, ESPACIADO, 0, WHITE);
+    DrawText("  A - D\n\n Mover", ESPACIADO, GetScreenHeight() / 2, 32, WHITE);
 
     // Dibuja Saltar
-    DrawTexture(spriteSaltando, ESPACIADO * 4 - ANCHO_SPRITE, 0, WHITE);
-    DrawText("  W \n\n Saltar", ESPACIADO * 4 - ANCHO_SPRITE, GetScreenHeight() / 2, 32, WHITE);
+    DrawTexture(spriteSaltando, ESPACIADO * 3 + ANCHO_SPRITE / 2, 0, WHITE);
+    DrawText("  W \n\n Saltar", ESPACIADO * 3 + ANCHO_SPRITE / 2, GetScreenHeight() / 2, 32, WHITE);
 
     // Dibuja Disparar
     DrawTexture(spriteClicIzquierdo, ESPACIADO * 7 - ANCHO_SPRITE, 10, WHITE);
@@ -147,18 +149,113 @@ void EscenaControles::DeInit()
 
 //--------------------------------------------------------------
 
-void EscenaNivel1::Init(){
-    // TODO: Cambiar constructores de personaje y tilemap
+void EscenaNivel1::Init()
+{
+    // Posicion inicial
+    jugador = new Personaje(100.0f, 700.0f);
+    // Indice de nivel jugable 1
+    tilemap = new Tilemap(1);
+    camara = { 0 };
+    camara.target = jugador->GetPositionV();
+    camara.offset = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
+    camara.rotation = 0.0f;
+    camara.zoom = 1.0f;
+
+    // Posiciones iniciales de los enemigos
+    std::vector<Vector2> posiciones = {{2000.0f, 750.0f}};
+    for (size_t i = 0; i < posiciones.size(); i++)
+        enemigos.push_back(new Enemigo(jugador, posiciones[i].x, posiciones[i].y));
+
+    TraceLog(LOG_INFO, "Nivel 1 CARGADO");
 }
 
-void EscenaNivel1::Update(int& indiceEscenaActual){
-    //
+void EscenaNivel1::Update(int &indiceEscenaActual)
+{
+    jugador->Update(*tilemap, camara);
+
+    for(auto& enemigo : enemigos)
+    enemigo->Update();
+
+    // Cambio a escena de derrota
+    if(jugador->vidas<=0)
+    indiceEscenaActual = 50;
 }
 
-void EscenaNivel1::Draw()const{
-    //
+void EscenaNivel1::Draw() const
+{
+    ClearBackground(RAYWHITE);
+
+    BeginMode2D(camara);
+    tilemap->Draw();
+    jugador->Draw();
+    // Dibuja a los enemigos
+    for (const auto &enemigo : enemigos)
+        enemigo->Draw();
+    EndMode2D();
+
+    // Dibuja el corazon
+    DrawTexture(jugador->corazonHud, 0, 0, WHITE);
+    // Dibuja la cantidad de vidas
+    char buff[20] = {};
+    sprintf(buff, "X%d", jugador->vidas);
+    DrawText(buff, 64, 32, 30, BLACK);
 }
 
-void EscenaNivel1::DeInit(){
-    //
+void EscenaNivel1::DeInit()
+{
+    delete jugador;
+    delete tilemap;
+    for (auto &enemigo : enemigos)
+        delete enemigo;
+    Escena::DeInit();
+    TraceLog(LOG_INFO, "EscenaNivel1 DEINIT");
+}
+
+
+void EscenaDerrota::Init(){
+    botonReiniciar = {
+        static_cast<float>(GetScreenWidth() / 2 - ANCHO_BOTON-100),
+        static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
+        static_cast<float>(ANCHO_BOTON),
+        static_cast<float>(ANCHO_BOTON)};
+
+
+        botonSalir = {
+        static_cast<float>(GetScreenWidth() / 2 + ANCHO_BOTON / 2),
+        static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
+        static_cast<float>(ANCHO_BOTON),
+        static_cast<float>(ANCHO_BOTON)};
+    TraceLog(LOG_INFO,"Escena Derrota CARGADA");
+}
+
+void EscenaDerrota::Update(int &indiceEscenaActual)
+{
+    if (ClicEnBoton(botonReiniciar))
+    {
+        indiceEscenaActual = 0;
+    }
+
+    if (ClicEnBoton(botonSalir))
+    {
+        indiceEscenaActual = INDICE_SALIDA;
+    }
+}
+
+void EscenaDerrota::Draw() const
+{
+    ClearBackground(BLACK);
+
+    DrawText("Perdiste", GetScreenWidth() / 2 - 100, 0, 32, RED);
+
+    // Boton de REINICIAR
+    DrawRectangleRec(botonReiniciar, GREEN);
+    DrawText("REINICIAR JUEGO", botonReiniciar.x, botonReiniciar.y + ANCHO_BOTON / 3, 20, WHITE);
+
+    // Boton de SALIR
+    DrawRectangleRec(botonSalir, RED);
+    DrawText("SALIR", botonSalir.x + ANCHO_BOTON * 5 / 15, botonSalir.y + ANCHO_BOTON / 3, 20, WHITE);
+}
+
+void EscenaDerrota::DeInit(){
+    TraceLog(LOG_INFO,"Escena Derrota LIBERADA");
 }

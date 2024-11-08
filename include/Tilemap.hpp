@@ -27,7 +27,7 @@ public:
 
     // Metodos
 
-    Tilemap();
+    Tilemap(int);
     int GetAncho() const;
     int GetAlto() const;
     const std::vector<unsigned int>& getMapaColisiones() const;

@@ -9,34 +9,37 @@
 #include "../include/Enemigo.hpp"
 #include <vector>
 
-
 // Clase abstracta
-class Escena{
+class Escena
+{
 public:
-virtual void Init() = 0;
-virtual void Update(int&) = 0;
-virtual void Draw() const = 0;
-virtual void DeInit();  // Incluye liberacion de memoria
+    virtual void Init() = 0;
+    virtual void Update(int &) = 0;
+    virtual void Draw() const = 0;
+    virtual void DeInit(); // Incluye liberacion de memoria
+    const int INDICE_SALIDA = -1;
 };
 
 // Clases derivadas
 
 // Un tipo de escena para menus interactivos(como el de inicio, victoria y derrota)
-class EscenaInteractuable : public Escena{
-    protected:
+class EscenaInteractuable : public Escena
+{
+protected:
     // Si se dio clic en algun menu/boton (inicio,salir, etc)
-    bool ClicEnBoton(const Rectangle&) const;
+    bool ClicEnBoton(const Rectangle &) const;
 };
 
 // La escena del menu principal
-class EscenaInicio : public EscenaInteractuable{
-    public:
+class EscenaInicio : public EscenaInteractuable
+{
+public:
     void Init();
-    void Update(int&);
-    void Draw()const;
+    void Update(int &);
+    void Draw() const;
     void DeInit();
-    
-    private:
+
+private:
     const int ANCHO_BOTON = 300;
     const int ALTO_BOTON = 50;
     // El sprite que se muestra en pantalla
@@ -46,14 +49,15 @@ class EscenaInicio : public EscenaInteractuable{
 };
 
 // La escena que muestra los controles del juego
-class EscenaControles : public EscenaInteractuable{
-    public:
+class EscenaControles : public EscenaInteractuable
+{
+public:
     void Init();
-    void Update(int&);
-    void Draw()const;
+    void Update(int &);
+    void Draw() const;
     void DeInit();
-    
-    private:
+
+private:
     Texture2D spriteCaminando;
     Texture2D spriteSaltando;
     Texture2D spriteClicIzquierdo;
@@ -61,20 +65,34 @@ class EscenaControles : public EscenaInteractuable{
     Rectangle botonSiguiente;
 };
 
-class EscenaJugable : public Escena{
-    protected:
-    std::vector<Enemigo> enemigos;
-    Personaje jugador;
-    Tilemap tilemap;
+class EscenaJugable : public Escena
+{
+protected:
+    std::vector<Enemigo*> enemigos;
+    Personaje *jugador;
+    Tilemap* tilemap;
     Camera2D camara;
 };
 
-class EscenaNivel1 : public EscenaJugable{
+class EscenaNivel1 : public EscenaJugable
+{
+public:
+    void Init();
+    void Update(int &);
+    void Draw() const;
+    void DeInit();
+};
+
+class EscenaDerrota : public EscenaInteractuable{
     public:
     void Init();
-    void Update(int&);
-    void Draw()const;
+    void Update(int &);
+    void Draw() const;
     void DeInit();
+    private:
+    Rectangle botonReiniciar;
+    Rectangle botonSalir;
+    const int ANCHO_BOTON = 200;
 };
 
 #endif // !ESCENA_H
