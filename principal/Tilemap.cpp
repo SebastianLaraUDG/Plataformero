@@ -1,5 +1,4 @@
 #include "../include/Tilemap.hpp"
-//#include <cstdio>
 #include <fstream> // Flujo de archivos
 #include "../include/json.hpp" // JSON
 

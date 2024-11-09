@@ -7,16 +7,19 @@
 
 class Enemigo{
     private:
-    Vector2 posicion;
     Vector2 velocidad;
-    bool activo;
     Texture2D sprite;
     Personaje* jugador;
     int ANCHO_SPRITE;
     int ALTO_SPRITE;
-    
+    int framesTranscurridos;
+    float tiempoCambioLado;
+    Color color;
+
     public:
-    Enemigo(Personaje*,const float&,const float&);
+    Enemigo(Personaje*,const float&,const float&,const float&);
+    Vector2 posicion;
+    int salud;
     void Update();
     void Draw() const;
     bool ColisionConJugador();

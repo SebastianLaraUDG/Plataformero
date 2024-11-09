@@ -2,29 +2,34 @@
 #include "../include/raymath.h"
 
 
-Enemigo::Enemigo(Personaje *jugador, const float &xInicial, const float &yInicial)
+Enemigo::Enemigo(Personaje *jugador, const float &xInicial, const float &yInicial,const float& tiempoCambio)
 {
     sprite = LoadTexture("../Assets/enemy.png");
     this->jugador = jugador;
     posicion.x = xInicial;
     posicion.y = yInicial;
     velocidad = {2.0f, 0.0f};
-    activo = true;
+    salud = 5;
     ANCHO_SPRITE = 88;
     ALTO_SPRITE = 61;
+    framesTranscurridos = 0;
+    tiempoCambioLado = tiempoCambio;
 }
 
 void Enemigo::Update()
 {
-    if (!activo)
+    // Muerte
+    if (salud<=0){
+        color = RED;
         return;
-    static int framesTranscurridos = 0;
+    }
     Vector2 nuevaPosicion = Vector2Add(posicion, velocidad);
 
     framesTranscurridos++;
+    
     // Movimiento basado en tiempo (3 segundos)
-    const int SEGUNDOS_TRANSCURRIDOS = framesTranscurridos / 60;
-    if (SEGUNDOS_TRANSCURRIDOS >= 3)
+    int SEGUNDOS_TRANSCURRIDOS = framesTranscurridos / 60;
+    if ((float)SEGUNDOS_TRANSCURRIDOS > tiempoCambioLado)
     {
         velocidad.x = -velocidad.x;
         framesTranscurridos = 0;
@@ -38,13 +43,13 @@ void Enemigo::Update()
     if(ColisionConJugador() ){
         jugador->RecibeDanio();
     }
+    color = WHITE;
 }
 
 void Enemigo::Draw() const
 {
     Rectangle rect = {0, 0, 88 * -velocidad.x / 2, 61};
-    DrawTextureRec(sprite, rect, posicion, WHITE);
-    DrawCircleV(posicion, 5.0f, WHITE); // TODO: Debug
+    DrawTextureRec(sprite, rect, posicion, color);
 }
 
 bool Enemigo::ColisionConJugador()

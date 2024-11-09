@@ -72,6 +72,8 @@ protected:
     Personaje *jugador;
     Tilemap* tilemap;
     Camera2D camara;
+    Texture2D spriteBanderaVictoria;
+    Rectangle banderaVictoria;
 };
 
 class EscenaNivel1 : public EscenaJugable
@@ -95,4 +97,24 @@ class EscenaDerrota : public EscenaInteractuable{
     const int ANCHO_BOTON = 200;
 };
 
+class EscenaNivel2 : public EscenaJugable
+{
+public:
+    void Init();
+    void Update(int &);
+    void Draw() const;
+    void DeInit();
+};
+
+class EscenaVictoria : public EscenaInteractuable{
+    public:
+    void Init();
+    void Update(int &);
+    void Draw() const;
+    void DeInit();
+    private:
+    Rectangle botonReiniciar;
+    Rectangle botonSalir;
+    const int ANCHO_BOTON = 200;
+};
 #endif // !ESCENA_H

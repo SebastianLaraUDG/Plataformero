@@ -6,6 +6,7 @@
 
 class Tilemap;
 
+
 class Personaje
 {
 private:
@@ -20,8 +21,12 @@ private:
 
 	// Velocidad maxima de caida
 	float velocidadTerminal;
+	
 	AnimationState animacion;
+	
+	// Tiempo de inmunidad (en frames)
 	int inmunidadDanioFrames;
+
 	Color color;
 
 	void MovimientoHorizontal(const Tilemap &);
@@ -40,9 +45,10 @@ protected:
 
 	float velocidadMovimiento; // Nota: es el cambio de velocidad
 	Texture2D tile_sheet;
-	Rectangle rectangulo;
+	
+	// Para alternar la orientacion del sprite segun el movimiento
 	short flipX;
-	ProyectilPool pool;
+	
 
 	void ActualizarAnimacion(const int &, const int &);
 	unsigned int ObtenerTileColision(const Tilemap &, const Vector2 &) const;
@@ -54,8 +60,13 @@ public:
 	Texture2D corazonHud;
 	int vidas;
 	bool puedeRecibirDanio;
+	Rectangle rectangulo;
+	ProyectilPool pool;
+
 	// Auxiliar para las colisiones
 	Vector2 pivoteColisiones;
+
+
 	void Update(const Tilemap &, Camera2D &);
 	void Draw() const;
 	Vector2 GetPositionV() const;

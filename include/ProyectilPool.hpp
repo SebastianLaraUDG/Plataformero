@@ -9,14 +9,12 @@
 
 class ProyectilPool
 {
-private:
-    std::vector<Proyectil> proyectiles;
-
 public:
     ProyectilPool(const size_t &);
     Proyectil *GetProyectil();
     void Update();
     void Draw() const;
+    std::vector<Proyectil> proyectiles;
 };
 
 #endif // !PROYECTIL_POOL_H

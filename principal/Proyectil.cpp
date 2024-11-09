@@ -2,9 +2,6 @@
 #include"../include/raymath.h"
 
 
-//TODO: Deberia agregar esta clase tambien a un json?
-
-
 Proyectil::Proyectil(){
     // Inicializacion a ceros e inactivo
     posicion = Vector2Zero();
@@ -38,10 +35,6 @@ void Proyectil::Update(){
     // Actualiza la posicion de acuerdo al producto de su direccion y velocidad
     posicion = Vector2Add(posicion, Vector2Scale(direccion,VELOCIDAD) );
 
-    //TODO: Si esta colisionando con un tile, desactivar
-
-
-
 
     tiempoTranscurrido++;
     // Desactiva en caso de que se ya superado su tiempo de vida
@@ -54,11 +47,11 @@ void Proyectil::Update(){
 
 void Proyectil::Draw() const{
     if(bActivo)
-    DrawCircleV(posicion,5.0f,RED);
+    DrawCircleV(posicion,RADIO,RED);
 }
 
 /// @brief Establece segun el valor especificado
-/// @param nuevoEstado
+/// @param nuevoEstado true para Activo, false para inactivo
 void Proyectil::SetEstado(const bool& nuevoEstado){
     bActivo = nuevoEstado;
 }
@@ -67,6 +60,9 @@ bool Proyectil::Activo() const{
     return bActivo;
 }
 
+bool Proyectil::ColisionConEnemigo(const Vector2& posEnemigo,const int& offsetEnemigo){
+    return Vector2Distance(posicion,posEnemigo) < offsetEnemigo + RADIO;
+}
 
 Proyectil::~Proyectil(){
     //UnloadTexture(sprite);

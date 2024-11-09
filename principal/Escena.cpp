@@ -1,6 +1,7 @@
 #include "../include/Escena.hpp"
 #include <cstdio>
 
+// Liberacion de memoria dinamica para evitar exceso de uso/asignacion en la Gestion de escenas de base.cpp
 void Escena::DeInit()
 {
     delete this;
@@ -155,16 +156,20 @@ void EscenaNivel1::Init()
     jugador = new Personaje(100.0f, 700.0f);
     // Indice de nivel jugable 1
     tilemap = new Tilemap(1);
-    camara = { 0 };
+    camara = {0};
     camara.target = jugador->GetPositionV();
-    camara.offset = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
+    camara.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
     camara.rotation = 0.0f;
     camara.zoom = 1.0f;
 
+    spriteBanderaVictoria = LoadTexture("../Assets/flagYellow2.png");
+    banderaVictoria = {
+        2475.0f, 190.0f, 64.0f, 64.0f};
+
     // Posiciones iniciales de los enemigos
-    std::vector<Vector2> posiciones = {{2000.0f, 750.0f}};
+    std::vector<Vector3> posiciones = {{1700.0f, 920.0f, 3}, {1507.0f, 520.0f, 1.4}, {370.0f, 475.0f, 1.4}, {1647.0f, 277.0f, 2.3}};
     for (size_t i = 0; i < posiciones.size(); i++)
-        enemigos.push_back(new Enemigo(jugador, posiciones[i].x, posiciones[i].y));
+        enemigos.push_back(new Enemigo(jugador, posiciones[i].x, posiciones[i].y, posiciones[i].z));
 
     TraceLog(LOG_INFO, "Nivel 1 CARGADO");
 }
@@ -173,17 +178,30 @@ void EscenaNivel1::Update(int &indiceEscenaActual)
 {
     jugador->Update(*tilemap, camara);
 
-    for(auto& enemigo : enemigos)
-    enemigo->Update();
+    for (auto &enemigo : enemigos)
+        enemigo->Update();
 
     // Cambio a escena de derrota
-    if(jugador->vidas<=0)
-    indiceEscenaActual = 50;
+    if (jugador->vidas <= 0)
+        indiceEscenaActual = 50;
+
+    for(auto& proyectil : jugador->pool.proyectiles){
+        for(auto& enemigo : enemigos){
+            if(proyectil.ColisionConEnemigo(enemigo->posicion))
+            enemigo->salud--;
+        }
+    }
+
+    // Cambio a siguiente nivel
+    if (CheckCollisionPointRec(jugador->pivoteColisiones,banderaVictoria))
+    {
+        indiceEscenaActual = 3;
+    }
 }
 
 void EscenaNivel1::Draw() const
 {
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLUE);
 
     BeginMode2D(camara);
     tilemap->Draw();
@@ -191,6 +209,10 @@ void EscenaNivel1::Draw() const
     // Dibuja a los enemigos
     for (const auto &enemigo : enemigos)
         enemigo->Draw();
+
+    // Dibuja la bandera
+    DrawTexture(spriteBanderaVictoria,banderaVictoria.x,banderaVictoria.y,WHITE);
+
     EndMode2D();
 
     // Dibuja el corazon
@@ -207,25 +229,25 @@ void EscenaNivel1::DeInit()
     delete tilemap;
     for (auto &enemigo : enemigos)
         delete enemigo;
+    UnloadTexture(spriteBanderaVictoria);
     Escena::DeInit();
     TraceLog(LOG_INFO, "EscenaNivel1 DEINIT");
 }
 
-
-void EscenaDerrota::Init(){
+void EscenaDerrota::Init()
+{
     botonReiniciar = {
-        static_cast<float>(GetScreenWidth() / 2 - ANCHO_BOTON-100),
+        static_cast<float>(GetScreenWidth() / 2 - ANCHO_BOTON - 100),
         static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
         static_cast<float>(ANCHO_BOTON),
         static_cast<float>(ANCHO_BOTON)};
 
-
-        botonSalir = {
+    botonSalir = {
         static_cast<float>(GetScreenWidth() / 2 + ANCHO_BOTON / 2),
         static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
         static_cast<float>(ANCHO_BOTON),
         static_cast<float>(ANCHO_BOTON)};
-    TraceLog(LOG_INFO,"Escena Derrota CARGADA");
+    TraceLog(LOG_INFO, "Escena Derrota CARGADA");
 }
 
 void EscenaDerrota::Update(int &indiceEscenaActual)
@@ -256,6 +278,156 @@ void EscenaDerrota::Draw() const
     DrawText("SALIR", botonSalir.x + ANCHO_BOTON * 5 / 15, botonSalir.y + ANCHO_BOTON / 3, 20, WHITE);
 }
 
-void EscenaDerrota::DeInit(){
-    TraceLog(LOG_INFO,"Escena Derrota LIBERADA");
+void EscenaDerrota::DeInit()
+{
+    Escena::DeInit();
+    TraceLog(LOG_INFO, "Escena Derrota LIBERADA");
+}
+
+
+void EscenaNivel2::Init(){
+    // Posicion inicial
+    jugador = new Personaje(202.0f, 90.0f);
+    // Indice de nivel jugable 1
+    tilemap = new Tilemap(2);
+    camara = {0};
+    camara.target = jugador->GetPositionV();
+    camara.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+    camara.rotation = 0.0f;
+    camara.zoom = 1.0f;
+
+    spriteBanderaVictoria = LoadTexture("../Assets/flagYellow2.png");
+    banderaVictoria = {
+        104.0f, 190.0f, 64.0f, 64.0f};
+
+    // Posiciones iniciales de los enemigos
+    std::vector<Vector3> posiciones = {
+        {1700.0f, 920.0f, 3.0f}, {1507.0f, 520.0f, 1.4},
+        {370.0f, 475.0f, 1.4},{1647.0f, 277.0f, 2.3},
+        {569.0f,250.0f,3.0f},{1800.0f,250.0f},
+        {1400.0f,750.0f,2.0f},{700.0f,900.0f,3.0f},
+        {400.0f,60.0f,4.0f},{800.0f,60.0f,3.0f}
+        };
+    for (size_t i = 0; i < posiciones.size(); i++)
+        enemigos.push_back(new Enemigo(jugador, posiciones[i].x, posiciones[i].y, posiciones[i].z));
+
+    TraceLog(LOG_INFO, "Nivel 2 CARGADO");
+}
+
+void EscenaNivel2::Update(int& indiceEscenaActual){
+    jugador->Update(*tilemap, camara);
+
+    for (auto &enemigo : enemigos)
+        enemigo->Update();
+
+    // Cambio a escena de derrota
+    if (jugador->vidas <= 0)
+        indiceEscenaActual = 50;
+
+    // Comprueba colisiones de proyectil con enemigos TODO: buscar una forma mas organizada (el pool de objetos complico esto)
+    for (auto &proyectil : jugador->pool.proyectiles)
+    {
+        if (proyectil.Activo())
+        {
+            for (auto &enemigo : enemigos)
+            {
+                if (proyectil.ColisionConEnemigo(enemigo->posicion))
+                {
+                    enemigo->salud--;
+                    proyectil.SetEstado(false);
+                }
+            }
+        }
+    }
+
+    // Cambio a escena de victoria
+    if (CheckCollisionPointRec(jugador->pivoteColisiones,banderaVictoria))
+    {
+        indiceEscenaActual = 10;
+    }
+}
+
+void EscenaNivel2::Draw()const{
+    ClearBackground(BLUE);
+
+    BeginMode2D(camara);
+    tilemap->Draw();
+    jugador->Draw();
+    // Dibuja a los enemigos
+    for (const auto &enemigo : enemigos)
+        enemigo->Draw();
+
+    // Dibuja la bandera
+    DrawTexture(spriteBanderaVictoria,banderaVictoria.x,banderaVictoria.y,WHITE);
+
+    EndMode2D();
+
+    // Dibuja el corazon
+    DrawTexture(jugador->corazonHud, 0, 0, WHITE);
+    // Dibuja la cantidad de vidas
+    char buff[20] = {};
+    sprintf(buff, "X%d", jugador->vidas);
+    DrawText(buff, 64, 32, 30, BLACK);
+}
+
+void EscenaNivel2::DeInit()
+{
+    delete jugador;
+    delete tilemap;
+    for (auto &enemigo : enemigos)
+        delete enemigo;
+    UnloadTexture(spriteBanderaVictoria);
+    Escena::DeInit();
+    TraceLog(LOG_INFO, "Escena Nivel 2 DEINIT");
+}
+
+
+void EscenaVictoria::Init()
+{
+    botonReiniciar = {
+        static_cast<float>(GetScreenWidth() / 2 - ANCHO_BOTON - 100),
+        static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
+        static_cast<float>(ANCHO_BOTON),
+        static_cast<float>(ANCHO_BOTON)};
+
+    botonSalir = {
+        static_cast<float>(GetScreenWidth() / 2 + ANCHO_BOTON / 2),
+        static_cast<float>(GetScreenHeight() / 2 - ANCHO_BOTON / 2),
+        static_cast<float>(ANCHO_BOTON),
+        static_cast<float>(ANCHO_BOTON)};
+    TraceLog(LOG_INFO, "Escena victoria CARGADA");
+}
+
+void EscenaVictoria::Update(int &indiceEscenaActual)
+{
+    if (ClicEnBoton(botonReiniciar))
+    {
+        indiceEscenaActual = 0;
+    }
+
+    if (ClicEnBoton(botonSalir))
+    {
+        indiceEscenaActual = INDICE_SALIDA;
+    }
+}
+
+void EscenaVictoria::Draw() const
+{
+    ClearBackground(BLACK);
+
+    DrawText("VICTORIA", GetScreenWidth() / 2 - 100, 0, 32, RED);
+
+    // Boton de REINICIAR
+    DrawRectangleRec(botonReiniciar, GREEN);
+    DrawText("REINICIAR JUEGO", botonReiniciar.x, botonReiniciar.y + ANCHO_BOTON / 3, 20, WHITE);
+
+    // Boton de SALIR
+    DrawRectangleRec(botonSalir, RED);
+    DrawText("SALIR", botonSalir.x + ANCHO_BOTON * 5 / 15, botonSalir.y + ANCHO_BOTON / 3, 20, WHITE);
+}
+
+void EscenaVictoria::DeInit()
+{
+    Escena::DeInit();
+    TraceLog(LOG_INFO, "Escena VICTORIA LIBERADA");
 }

@@ -1,27 +1,10 @@
 #include "../include/Escena.hpp"
 
-/*
-LISTA TODO:
-Hacer mas pequenio al personaje y los tiles
-
-TODO: quitar todos los delete de cada clase de escena y crear un metodo en la clase Escena para el delete? --Archivo Escena.hpp/Escena.cpp
-TODO: Necesario? escenaActual = new EscenaJuego(); --Este archivo
-// TODO: Dibujar los controles -- Escena.cpp, EscenaControles::Draw
- */
 
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
 
-/// @brief Centra la camara en el personaje
-/// @param camera Objeto camara
-/// @param personaje
-/// @param width Ancho de la pantalla
-/// @param height Alto de la pantalla
-void UpdateCameraCenter(Camera2D* camera,const Personaje& personaje,const int& width,const int& height){
-    camera->offset = { width/2.0f, height/2.0f };
-    camera->target = personaje.GetPositionV();
-}
 
 void GestionaEscena(Escena *&escenaActual, int &indiceEscenaActual, int &indiceEscenaPasada,const int& INDICE_SALIDA = -1)
 {
@@ -48,7 +31,12 @@ void GestionaEscena(Escena *&escenaActual, int &indiceEscenaActual, int &indiceE
         case 2:
             escenaActual = new EscenaNivel1();
             break;
-
+        case 3:
+            escenaActual = new EscenaNivel2();
+            break;
+        case 10:
+            escenaActual = new EscenaVictoria();
+            break;
         case 50: // Escena de derrota
             escenaActual = new EscenaDerrota();
         }
@@ -61,37 +49,12 @@ void GestionaEscena(Escena *&escenaActual, int &indiceEscenaActual, int &indiceE
     }
 }
 
-void juegoFinal(){
-    const int INDICE_SALIDA = -1;
-    int indiceEscenaActual = 0;
-    int indiceEscenaPasada = indiceEscenaActual;
-
-    // Iniciamos el juego con el menu principal
-    Escena *escenaActual = new EscenaInicio();
-    escenaActual->Init();
-
-    while(true && indiceEscenaActual != INDICE_SALIDA){// Loop a corregirse en el final
-
-        // Aqui se actualizaran todos los updates, incluyendo la camara
-        GestionaEscena(escenaActual,indiceEscenaActual,indiceEscenaPasada,INDICE_SALIDA);
-
-
-
-        BeginDrawing();
-         //   ClearBackground(RAYWHITE);
-        EndDrawing();
-    }
-
-    // Final
-    escenaActual->DeInit();
-    CloseWindow();
-}
 
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 960;//800;
+    const int screenWidth = 960;
     const int screenHeight = 540;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
@@ -101,13 +64,13 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     // Gestion de escenas
+    
     const int INDICE_SALIDA = -1;
     int indiceEscenaActual = 0;
     int indiceEscenaPasada = indiceEscenaActual;
     Escena *escenaActual = new EscenaInicio();
     escenaActual->Init();
-
-
+    
 
     // Main game loop
     while (!WindowShouldClose() && indiceEscenaActual != INDICE_SALIDA)    // Detect window close button or ESC key
@@ -124,7 +87,6 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-        // ClearBackground(RAYWHITE);
         escenaActual->Draw();
 
         EndDrawing();
