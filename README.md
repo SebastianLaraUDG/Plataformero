@@ -1,15 +1,47 @@
 # Plataformero
-Plataformero 2D hecho en programación de videojuegos
-Proyecto 2 de la clase Programación de videojuegos.
-En Raylib C++
 
-Controles:
-La mayoría están explicados en el juego, pero una pequeña aclaración
-En la posicion en la que esta el cursor, es a donde se dispara el proyectil
-(No se pudo explicar en el juego por cuestiones de tiempo)
+**Plataformero 2D hecho en Raylib (C++)**  
+Proyecto 2 de la clase **Programación de Videojuegos** 🎮
 
-Implementa:
-Movimiento,
-Colisiones
-Pool Object
-Clases abstractas
+---
+
+### 📦 Descripción
+
+Este juego fue desarrollado como parte del curso, utilizando la biblioteca gráfica **Raylib** y el lenguaje **C++**.
+
+Contiene 3 niveles.
+
+---
+
+### 🎮 Controles
+
+La mayoría de los controles están explicados dentro del juego.
+
+🔺 **Nota importante**:  
+El proyectil se dispara en dirección a la posición del **cursor del mouse**.  
+(No se explicó dentro del juego por falta de tiempo.)
+
+---
+
+### 🧩 Características implementadas
+
+- ✅ Movimiento del personaje  
+- ✅ Detección de colisiones  
+- ✅ Sistema de **Object Pooling**  
+- ✅ Uso de **clases abstractas**
+
+---
+
+### 📷 Capturas del juego
+
+### Menu de inicio
+![Captura del juego](/Screenshots/Plataformero%20(2).png)
+
+### Controles
+![Captura del juego](/Screenshots/Plataformero%20(3).png)
+
+###
+### Capturas del juego
+![Captura del juego](/Screenshots/Plataformero%20(5).png)
+![Captura del juego](/Screenshots/Plataformero%20(6).png)
+![Captura del juego](/Screenshots/Plataformero%20(7).png)
