@@ -13,6 +13,13 @@ Contiene 3 niveles.
 
 ---
 
+
+### Ejecucion
+
+Descarga el .zip y en la carpeta principal ejecuta el archivo base.exe
+
+---
+
 ### 🎮 Controles
 
 La mayoría de los controles están explicados dentro del juego.
